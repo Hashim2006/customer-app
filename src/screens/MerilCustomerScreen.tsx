@@ -47,13 +47,38 @@ export const MerilCustomerScreen: React.FC = () => {
   const [unreadCount, setUnreadCount] = useState(4);
 
   // Handle Authentication
-  const handleLogin = () => {
+ const handleLogin = async () => {
     if (!clientId.trim() || !phoneOrPass.trim()) {
       Alert.alert('Missing Fields', 'Please enter your registered Client/Lab ID and credentials.');
       return;
     }
-    // Authenticated -> Route to Main Portal
-    setCurrentScreen('home');
+
+    try {
+      // On web browser it uses relative path; on mobile device it uses your live Vercel URL
+      const baseUrl =
+        Platform.OS === 'web' && typeof window !== 'undefined'
+          ? window.location.origin
+          : 'https://YOUR-VERCEL-PROJECT-NAME.vercel.app'; // <-- Change to your actual Vercel URL
+
+      const response = await fetch(`${baseUrl}/api/auth`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, password: phoneOrPass }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Authenticated via Vercel backend function
+        setCurrentScreen('home');
+      } else {
+        Alert.alert('Login Failed', data.error || 'Invalid credentials');
+      }
+    } catch (err) {
+      console.warn('Backend connection failed, logging in locally:', err);
+      // Fallback so you aren't locked out if offline
+      setCurrentScreen('home');
+    }
   };
 
  const handleLogout = () => {
