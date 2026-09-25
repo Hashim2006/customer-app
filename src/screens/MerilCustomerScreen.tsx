@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
   Dimensions,
   Platform,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -31,57 +32,127 @@ type ScreenType =
   | 'engineerTracking'
   | 'reports';
 
+interface TicketData {
+  ticketId: string;
+  analyzer: string;
+  issueType: string;
+  status: string;
+  slaTarget: string;
+  assignedEngineer: {
+    name: string;
+    role: string;
+    etaMins: number;
+    phone: string;
+    distanceKm: number;
+  };
+  verificationOtp: string;
+}
+
+interface ReagentItem {
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+}
+
 export const MerilCustomerScreen: React.FC = () => {
-  // Starts directly on the Login screen
   const [currentScreen, setCurrentScreen] = useState<ScreenType>('login');
-  
-  // Login form state
+
+  // Form State
   const [clientId, setClientId] = useState('MER-882190');
   const [phoneOrPass, setPhoneOrPass] = useState('password123');
   const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
   const [otpSent, setOtpSent] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  // App core state
+  // Core App State
   const [sosActive, setSosActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(4);
+  const [feedbackRating, setFeedbackRating] = useState(5);
+  const [feedbackText, setFeedbackText] = useState('');
+
+  // Live Backend Data States
+  const [liveTicket, setLiveTicket] = useState<TicketData | null>(null);
+  const [liveReagents, setLiveReagents] = useState<ReagentItem[]>([]);
+  const [loadingService, setLoadingService] = useState(false);
+  const [loadingReagents, setLoadingReagents] = useState(false);
+
+  const getBaseUrl = () => {
+    return Platform.OS === 'web' && typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://customer-app-eight-mu.vercel.app';
+  };
+
+  // Fetch Live Service Ticket from Vercel Serverless Function
+  const fetchServiceData = async () => {
+    setLoadingService(true);
+    try {
+      const res = await fetch(`${getBaseUrl()}/api/service`);
+      const data = await res.json();
+      if (data?.activeTickets && data.activeTickets.length > 0) {
+        setLiveTicket(data.activeTickets[0]);
+      }
+    } catch (err) {
+      console.warn('Using local fallback for service tickets:', err);
+    } finally {
+      setLoadingService(false);
+    }
+  };
+
+  // Fetch Live Reagents from Vercel Serverless Function
+  const fetchReagentsData = async () => {
+    setLoadingReagents(true);
+    try {
+      const res = await fetch(`${getBaseUrl()}/api/reagents`);
+      const data = await res.json();
+      if (data?.reagents && data.reagents.length > 0) {
+        setLiveReagents(data.reagents);
+      }
+    } catch (err) {
+      console.warn('Using local fallback for reagents:', err);
+    } finally {
+      setLoadingReagents(false);
+    }
+  };
+
+  useEffect(() => {
+    if (currentScreen !== 'login') {
+      fetchServiceData();
+      fetchReagentsData();
+    }
+  }, [currentScreen]);
 
   // Handle Authentication
- const handleLogin = async () => {
+  const handleLogin = async () => {
     if (!clientId.trim() || !phoneOrPass.trim()) {
       Alert.alert('Missing Fields', 'Please enter your registered Client/Lab ID and credentials.');
       return;
     }
 
+    setIsAuthenticating(true);
     try {
-      // On web browser it uses relative path; on mobile device it uses your live Vercel URL
-      const baseUrl =
-        Platform.OS === 'web' && typeof window !== 'undefined'
-          ? window.location.origin
-          : 'https://YOUR-VERCEL-PROJECT-NAME.vercel.app'; // <-- Change to your actual Vercel URL
-
-      const response = await fetch(`${baseUrl}/api/auth`, {
+      const response = await fetch(`${getBaseUrl()}/api/auth`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ clientId, password: phoneOrPass }),
       });
 
       const data = await response.json();
-
       if (response.ok && data.success) {
-        // Authenticated via Vercel backend function
         setCurrentScreen('home');
       } else {
         Alert.alert('Login Failed', data.error || 'Invalid credentials');
       }
     } catch (err) {
-      console.warn('Backend connection failed, logging in locally:', err);
-      // Fallback so you aren't locked out if offline
+      console.warn('Backend connection offline, using fallback:', err);
       setCurrentScreen('home');
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
- const handleLogout = () => {
+  const handleLogout = () => {
     if (Platform.OS === 'web') {
       if (window.confirm('Are you sure you want to log out of Apollo Diagnostic Lab session?')) {
         setCurrentScreen('login');
@@ -92,20 +163,13 @@ export const MerilCustomerScreen: React.FC = () => {
         'Are you sure you want to log out of Apollo Diagnostic Lab session?',
         [
           { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Log Out',
-            style: 'destructive',
-            onPress: () => {
-              setCurrentScreen('login');
-            },
-          },
+          { text: 'Log Out', style: 'destructive', onPress: () => setCurrentScreen('login') },
         ],
         { cancelable: true }
       );
     }
   };
 
-  // 10 Customer Modules
   const modules = [
     {
       id: 'machines' as ScreenType,
@@ -193,7 +257,7 @@ export const MerilCustomerScreen: React.FC = () => {
     {
       id: '1',
       title: 'Engineer Dispatched',
-      desc: 'Rajesh Sharma is en route (ETA 25m) for ticket #MER-90214.',
+      desc: `${liveTicket?.assignedEngineer?.name ?? 'Rajesh Sharma'} is en route for ticket #${liveTicket?.ticketId ?? 'MER-90214'}.`,
       time: '10m ago',
       type: 'service',
       unread: true,
@@ -245,13 +309,10 @@ export const MerilCustomerScreen: React.FC = () => {
             contentContainerStyle={styles.loginScrollContent}
             showsVerticalScrollIndicator={false}
           >
-            {/* Meril Brand Logo */}
             <View style={styles.loginHeader}>
               <View style={styles.loginBrandCircle}>
                 <Image
-                  source={{
-                    uri: 'https://cdn-icons-png.flaticon.com/512/3004/3004458.png',
-                  }}
+                  source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3004/3004458.png' }}
                   style={styles.loginBrandImage}
                 />
               </View>
@@ -259,12 +320,10 @@ export const MerilCustomerScreen: React.FC = () => {
               <Text style={styles.loginSubtitle}>Customer & Lab Diagnostic Portal[cite: 1]</Text>
             </View>
 
-            {/* Login Card */}
             <View style={styles.loginCard}>
               <Text style={styles.cardHeading}>Sign In to Account</Text>
               <Text style={styles.cardSub}>Enter your hospital / diagnostic center credentials</Text>
 
-              {/* Toggle Login Method */}
               <View style={styles.tabToggle}>
                 <TouchableOpacity
                   style={[styles.tabButton, loginMethod === 'password' && styles.tabButtonActive]}
@@ -287,7 +346,6 @@ export const MerilCustomerScreen: React.FC = () => {
                 </TouchableOpacity>
               </View>
 
-              {/* Input 1: Client ID */}
               <Text style={styles.inputLabel}>LAB / CLIENT ID</Text>
               <View style={styles.inputContainer}>
                 <Text style={styles.inputPrefixIcon}>🏥</Text>
@@ -301,7 +359,6 @@ export const MerilCustomerScreen: React.FC = () => {
                 />
               </View>
 
-              {/* Input 2: Password or OTP */}
               <Text style={styles.inputLabel}>
                 {loginMethod === 'password' ? 'ACCESS PASSWORD' : 'PHONE / VERIFICATION CODE'}
               </Text>
@@ -330,9 +387,17 @@ export const MerilCustomerScreen: React.FC = () => {
                 )}
               </View>
 
-              {/* Sign In CTA */}
-              <TouchableOpacity style={styles.loginBtn} activeOpacity={0.8} onPress={handleLogin}>
-                <Text style={styles.loginBtnText}>Enter Portal →</Text>
+              <TouchableOpacity
+                style={styles.loginBtn}
+                activeOpacity={0.8}
+                onPress={handleLogin}
+                disabled={isAuthenticating}
+              >
+                {isAuthenticating ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <Text style={styles.loginBtnText}>Enter Portal →</Text>
+                )}
               </TouchableOpacity>
 
               <View style={styles.loginFooterRow}>
@@ -350,7 +415,6 @@ export const MerilCustomerScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Bottom Support Badge */}
             <View style={styles.supportBadge}>
               <Text style={styles.supportBadgeText}>🔒 ISO 13485 & HIPAA Compliant Healthcare Portal</Text>
             </View>
@@ -450,24 +514,15 @@ export const MerilCustomerScreen: React.FC = () => {
         </View>
         <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
           <Text style={styles.infoKey}>Site Location</Text>
-          <Text style={styles.infoVal}>
-            Plot 42, Central Wing, Medical City, Mumbai, MH
-          </Text>
+          <Text style={styles.infoVal}>Plot 42, Central Wing, Medical City, Mumbai, MH</Text>
         </View>
       </View>
 
       <View style={styles.stackedButtonGroup}>
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={() => setCurrentScreen('machines')}
-        >
+        <TouchableOpacity style={styles.primaryBtn} onPress={() => setCurrentScreen('machines')}>
           <Text style={styles.primaryBtnText}>View Registered Machines</Text>
         </TouchableOpacity>
-       <TouchableOpacity
-          style={styles.logoutBtn}
-          activeOpacity={0.7}
-          onPress={() => setCurrentScreen('login')}
-        >
+        <TouchableOpacity style={styles.logoutBtn} activeOpacity={0.7} onPress={handleLogout}>
           <Text style={styles.logoutBtnText}>Sign Out of Session 🚪</Text>
         </TouchableOpacity>
       </View>
@@ -486,7 +541,7 @@ export const MerilCustomerScreen: React.FC = () => {
 
       {[
         {
-          name: 'Meril Quant-Mate 400',
+          name: liveTicket?.analyzer ?? 'Meril Quant-Mate 400',
           sn: 'MQM-2024-8841',
           status: 'Operational',
           nextPM: '15 Oct 2026',
@@ -513,9 +568,7 @@ export const MerilCustomerScreen: React.FC = () => {
                 <View
                   style={[
                     styles.statusTag,
-                    machine.status === 'Operational'
-                      ? styles.statusSuccess
-                      : styles.statusWarning,
+                    machine.status === 'Operational' ? styles.statusSuccess : styles.statusWarning,
                   ]}
                 >
                   <Text style={styles.statusTagText}>{machine.status}</Text>
@@ -528,10 +581,7 @@ export const MerilCustomerScreen: React.FC = () => {
           </View>
 
           <View style={[styles.stackedButtonGroup, { marginTop: 12 }]}>
-            <TouchableOpacity
-              style={styles.primaryBtn}
-              onPress={() => setCurrentScreen('service')}
-            >
+            <TouchableOpacity style={styles.primaryBtn} onPress={() => setCurrentScreen('service')}>
               <Text style={styles.primaryBtnText}>Book Service</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -572,7 +622,7 @@ export const MerilCustomerScreen: React.FC = () => {
               sosActive ? 'SOS Cancelled' : 'SOS Dispatched',
               sosActive
                 ? 'Your priority escalation has been cancelled.'
-                : 'Meril Regional Dispatch notified.'
+                : 'Meril Regional Dispatch notified. Specialist en route.'
             );
           }}
         >
@@ -582,18 +632,34 @@ export const MerilCustomerScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={[styles.sectionHeading, { marginTop: 20 }]}>Active Service Request</Text>
+      <View style={[styles.rowBetween, { marginTop: 20 }]}>
+        <Text style={styles.sectionHeading}>Active Service Request</Text>
+        {loadingService && <ActivityIndicator size="small" color="#007b8a" />}
+      </View>
+
       <View style={styles.recordCard}>
         <View style={styles.rowBetween}>
-          <Text style={styles.recordTitle}>Ticket #MER-90214</Text>
-          <Text style={styles.statusTagTextActive}>In Progress</Text>
+          <Text style={styles.recordTitle}>
+            Ticket #{liveTicket ? liveTicket.ticketId : 'MER-90214'}
+          </Text>
+          <Text style={styles.statusTagTextActive}>
+            {liveTicket ? liveTicket.status : 'In Progress'}
+          </Text>
         </View>
-        <Text style={styles.recordSubtitle}>Analyzer: Meril Quant-Mate 400</Text>
-        <Text style={styles.metaItem}>Engineer: Rajesh Sharma (ETA 45m)</Text>
+        <Text style={styles.recordSubtitle}>
+          Analyzer: {liveTicket ? liveTicket.analyzer : 'Meril Quant-Mate 400'}
+        </Text>
+        <Text style={styles.metaItem}>
+          Issue: {liveTicket ? liveTicket.issueType : 'Flow-cell optical sensor calibration error'}
+        </Text>
+        <Text style={styles.metaItem}>
+          Engineer: {liveTicket?.assignedEngineer?.name ?? 'Rajesh Sharma'} (ETA{' '}
+          {liveTicket?.assignedEngineer?.etaMins ?? 25}m)
+        </Text>
 
         <View style={styles.otpBanner}>
-          <Text style={styles.otpBannerTitle}>Service Closure OTP</Text>
-          <Text style={styles.otpNumber}>5892</Text>
+          <Text style={styles.otpBannerTitle}>Service Closure Verification OTP</Text>
+          <Text style={styles.otpNumber}>{liveTicket?.verificationOtp ?? '5892'}</Text>
           <Text style={styles.otpNote}>Share only after verification of repair[cite: 1].</Text>
         </View>
 
@@ -610,49 +676,244 @@ export const MerilCustomerScreen: React.FC = () => {
   /* ----------------------------------------------------
      6. ENGINEER LIVE TRACKING
   ---------------------------------------------------- */
-  const renderEngineerTrackingPage = () => (
-    <View style={styles.subPageContainer}>
-      <Text style={styles.pageHeader}>Live Field Tracking</Text>
-      <Text style={styles.pageSubHeader}>
-        Technician communication and dispatched telemetry[cite: 1].
-      </Text>
+  const renderEngineerTrackingPage = () => {
+    const engineer = liveTicket?.assignedEngineer;
+    return (
+      <View style={styles.subPageContainer}>
+        <Text style={styles.pageHeader}>Live Field Tracking</Text>
+        <Text style={styles.pageSubHeader}>
+          Technician communication and dispatched telemetry[cite: 1].
+        </Text>
 
-      <View style={styles.recordCard}>
-        <Image
-          source={{
-            uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80',
-          }}
-          style={styles.mapImage}
-        />
-        <View style={styles.engineerCard}>
+        <View style={styles.recordCard}>
           <Image
             source={{
-              uri: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+              uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80',
             }}
-            style={styles.engineerPhoto}
+            style={styles.mapImage}
           />
-          <View style={{ flex: 1, marginLeft: 12 }}>
-            <Text style={styles.recordTitle}>Rajesh Sharma</Text>
-            <Text style={styles.recordSubtitle}>Senior Field Engineer</Text>
-            <Text style={styles.etaHighlight}>⏱ ETA: 25 Mins (3.4 km)</Text>
+          <View style={styles.engineerCard}>
+            <Image
+              source={{
+                uri: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
+              }}
+              style={styles.engineerPhoto}
+            />
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.recordTitle}>{engineer?.name ?? 'Rajesh Sharma'}</Text>
+              <Text style={styles.recordSubtitle}>
+                {engineer?.role ?? 'Senior Field Specialist'}
+              </Text>
+              <Text style={styles.etaHighlight}>
+                ⏱ ETA: {engineer?.etaMins ?? 25} Mins ({engineer?.distanceKm ?? 3.4} km away)
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.stackedButtonGroup}>
+            <TouchableOpacity
+              style={styles.outlinedBtn}
+              onPress={() =>
+                Alert.alert('Calling', `Dialing ${engineer?.phone ?? '+91 98200 11223'}...`)
+              }
+            >
+              <Text style={styles.outlinedBtnText}>📞 Voice Call Engineer</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.primaryBtn, { backgroundColor: '#16a34a' }]}
+              onPress={() => Alert.alert('WhatsApp', 'Opening encrypted chat with specialist...')}
+            >
+              <Text style={styles.primaryBtnText}>💬 WhatsApp Specialist</Text>
+            </TouchableOpacity>
           </View>
         </View>
-
-        <View style={styles.stackedButtonGroup}>
-          <TouchableOpacity
-            style={styles.outlinedBtn}
-            onPress={() => Alert.alert('Calling', 'Calling Rajesh Sharma...')}
-          >
-            <Text style={styles.outlinedBtnText}>📞 Voice Call</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.primaryBtn, { backgroundColor: '#16a34a' }]}
-            onPress={() => Alert.alert('WhatsApp', 'Opening WhatsApp...')}
-          >
-            <Text style={styles.primaryBtnText}>💬 WhatsApp</Text>
-          </TouchableOpacity>
-        </View>
       </View>
+    );
+  };
+
+  /* ----------------------------------------------------
+     7. REAGENTS MODULE
+  ---------------------------------------------------- */
+  const renderReagentsPage = () => {
+    const defaultReagents: ReagentItem[] = [
+      { id: '1', name: 'Meril SGOT / AST Clinical Pack', sku: 'MER-CH-012', price: 4850 },
+      { id: '2', name: 'Direct Creatinine Kinetic Assay', sku: 'MER-CH-044', price: 3200 },
+    ];
+    const items = liveReagents.length > 0 ? liveReagents : defaultReagents;
+
+    return (
+      <View style={styles.subPageContainer}>
+        <View style={styles.rowBetween}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.pageHeader}>Reagent Ordering</Text>
+            <Text style={styles.pageSubHeader}>Original Meril assays, calibrators and controls.</Text>
+          </View>
+          {loadingReagents && <ActivityIndicator size="small" color="#007b8a" />}
+        </View>
+
+        {items.map((reagent) => (
+          <View key={reagent.id} style={styles.recordCard}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.recordTitle}>{reagent.name}</Text>
+              <Text style={[styles.statNumber, { fontSize: 14, color: '#007b8a' }]}>
+                ₹{reagent.price.toLocaleString()}
+              </Text>
+            </View>
+            <Text style={styles.recordSubtitle}>SKU: {reagent.sku} • In Stock</Text>
+            <TouchableOpacity
+              style={[styles.primaryBtn, { marginTop: 10 }]}
+              onPress={() => Alert.alert('Order Placed', `${reagent.name} added to next shipment.`)}
+            >
+              <Text style={styles.primaryBtnText}>Reorder Assays 📦</Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+    );
+  };
+
+  /* ----------------------------------------------------
+     8. SHOP & CATALOGUE MODULE
+  ---------------------------------------------------- */
+  const renderShopPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Equipment Catalogue</Text>
+      <Text style={styles.pageSubHeader}>Explore next-generation clinical pathology platforms.</Text>
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>Meril Quant-Mate 800 (High-Throughput)</Text>
+        <Text style={styles.recordSubtitle}>Automated Clinical Chemistry Analyzer • 800 tests/hr</Text>
+        <TouchableOpacity
+          style={[styles.primaryBtn, { marginTop: 10 }]}
+          onPress={() => Alert.alert('Quote Requested', 'A Meril representative will contact you.')}
+        >
+          <Text style={styles.primaryBtnText}>Request Institutional Quotation</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  /* ----------------------------------------------------
+     9. WARRANTY & AMC MODULE
+  ---------------------------------------------------- */
+  const renderWarrantyPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Warranty & Annual Maintenance</Text>
+      <Text style={styles.pageSubHeader}>Coverage policies and preventive schedule compliance.</Text>
+      <View style={styles.recordCard}>
+        <View style={styles.rowBetween}>
+          <Text style={styles.recordTitle}>Comprehensive AMC Gold</Text>
+          <View style={[styles.statusTag, styles.statusSuccess]}>
+            <Text style={styles.statusTagText}>Active</Text>
+          </View>
+        </View>
+        <Text style={styles.recordSubtitle}>Coverage: 3 Analyzers (Parts, Labor & Sensors)</Text>
+        <Text style={styles.metaItem}>Valid through: 15 Dec 2027</Text>
+      </View>
+    </View>
+  );
+
+  /* ----------------------------------------------------
+     10. SERVICE TRACKING TIMELINE
+  ---------------------------------------------------- */
+  const renderTrackingPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Active Service Ticket Timeline</Text>
+      <Text style={styles.pageSubHeader}>
+        Real-time telemetry for ticket #{liveTicket?.ticketId ?? 'MER-90214'}.
+      </Text>
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>Status: {liveTicket?.status ?? 'In Progress'}</Text>
+        <Text style={styles.metaItem}>1. Dispatched: 10:15 AM</Text>
+        <Text style={styles.metaItem}>2. Field Transit: ETA {liveTicket?.assignedEngineer?.etaMins ?? 25} Mins</Text>
+        <Text style={styles.metaItem}>3. Calibration: Pending Arrival</Text>
+        <TouchableOpacity
+          style={[styles.primaryBtn, { marginTop: 12 }]}
+          onPress={() => setCurrentScreen('engineerTracking')}
+        >
+          <Text style={styles.primaryBtnText}>View GPS Map</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  /* ----------------------------------------------------
+     11. FEEDBACK MODULE
+  ---------------------------------------------------- */
+  const renderFeedbackPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Technician Feedback</Text>
+      <Text style={styles.pageSubHeader}>Rate recent service satisfaction for ticket closure.</Text>
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>Specialist: {liveTicket?.assignedEngineer?.name ?? 'Rajesh Sharma'}</Text>
+        <View style={{ flexDirection: 'row', gap: 10, marginVertical: 12 }}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <TouchableOpacity key={star} onPress={() => setFeedbackRating(star)}>
+              <Text style={{ fontSize: 26 }}>{star <= feedbackRating ? '⭐' : '☆'}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <TextInput
+          style={[styles.textInput, { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 8 }]}
+          placeholder="Write your feedback..."
+          value={feedbackText}
+          onChangeText={setFeedbackText}
+        />
+        <TouchableOpacity
+          style={[styles.primaryBtn, { marginTop: 12 }]}
+          onPress={() => {
+            Alert.alert('Feedback Submitted', 'Thank you for rating our service!');
+            setCurrentScreen('home');
+          }}
+        >
+          <Text style={styles.primaryBtnText}>Submit Rating</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  /* ----------------------------------------------------
+     12. TRAINING & LEARNING
+  ---------------------------------------------------- */
+  const renderTrainingPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>SOPs & Training Manuals</Text>
+      <Text style={styles.pageSubHeader}>Digital guides and clinical operating procedures.</Text>
+      {['Quant-Mate 400 Calibration Video', 'Daily Optical Sensor Maintenance', 'Reagent Storage Protocol'].map(
+        (doc, index) => (
+          <View key={index} style={styles.recordCard}>
+            <Text style={styles.recordTitle}>{doc}</Text>
+            <TouchableOpacity
+              style={[styles.outlinedBtn, { marginTop: 8 }]}
+              onPress={() => Alert.alert('Resource', `Opening ${doc}`)}
+            >
+              <Text style={styles.outlinedBtnText}>Download PDF / Video 📖</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      )}
+    </View>
+  );
+
+  /* ----------------------------------------------------
+     13. SERVICE AUDIT REPORTS
+  ---------------------------------------------------- */
+  const renderReportsPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Service & Audit Reports</Text>
+      <Text style={styles.pageSubHeader}>Download signed ISO and NABL compliance certificates.</Text>
+      {['Q3 Preventive Calibration Certificate', 'Annual Electrical Safety Audit 2026', 'Optical QC Alignment Report'].map(
+        (rep, idx) => (
+          <View key={idx} style={styles.recordCard}>
+            <Text style={styles.recordTitle}>{rep}</Text>
+            <TouchableOpacity
+              style={[styles.primaryBtn, { marginTop: 8 }]}
+              onPress={() => Alert.alert('Report', `Downloading ${rep}...`)}
+            >
+              <Text style={styles.primaryBtnText}>Download Signed PDF 📄</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      )}
     </View>
   );
 
@@ -672,9 +933,7 @@ export const MerilCustomerScreen: React.FC = () => {
         >
           <View style={styles.brandIconCircle}>
             <Image
-              source={{
-                uri: 'https://cdn-icons-png.flaticon.com/512/3004/3004458.png',
-              }}
+              source={{ uri: 'https://cdn-icons-png.flaticon.com/512/3004/3004458.png' }}
               style={styles.brandImage}
             />
           </View>
@@ -684,7 +943,7 @@ export const MerilCustomerScreen: React.FC = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Top Right: Bell & Profile */}
+        {/* Top Right Actions */}
         <View style={styles.headerRightActions}>
           <TouchableOpacity
             style={[
@@ -730,7 +989,6 @@ export const MerilCustomerScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Back Button */}
         {currentScreen !== 'home' && (
           <TouchableOpacity
             style={styles.backButton}
@@ -740,7 +998,6 @@ export const MerilCustomerScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* Home Screen Overview */}
         {currentScreen === 'home' && (
           <>
             <View style={styles.heroSection}>
@@ -765,7 +1022,6 @@ export const MerilCustomerScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Live Search */}
             <View style={styles.searchBarContainer}>
               <Text style={{ marginRight: 8 }}>🔍</Text>
               <TextInput
@@ -777,7 +1033,6 @@ export const MerilCustomerScreen: React.FC = () => {
               />
             </View>
 
-            {/* Section Header */}
             <View style={styles.rowBetween}>
               <Text style={styles.sectionTitle}>Customer Modules</Text>
               <View style={styles.modulesCountBadge}>
@@ -785,7 +1040,6 @@ export const MerilCustomerScreen: React.FC = () => {
               </View>
             </View>
 
-            {/* Modules Grid */}
             <View style={styles.grid}>
               {filteredModules.map((item) => (
                 <TouchableOpacity
@@ -804,12 +1058,7 @@ export const MerilCustomerScreen: React.FC = () => {
                         { backgroundColor: `${item.badgeColor}15` },
                       ]}
                     >
-                      <Text
-                        style={[
-                          styles.moduleBadgeText,
-                          { color: item.badgeColor },
-                        ]}
-                      >
+                      <Text style={[styles.moduleBadgeText, { color: item.badgeColor }]}>
                         {item.badge}
                       </Text>
                     </View>
@@ -822,12 +1071,19 @@ export const MerilCustomerScreen: React.FC = () => {
           </>
         )}
 
-        {/* Subpages */}
+        {/* Sub-Pages */}
         {currentScreen === 'notifications' && renderNotificationsPage()}
         {currentScreen === 'profile' && renderProfilePage()}
         {currentScreen === 'machines' && renderMachinesPage()}
         {currentScreen === 'service' && renderServicePage()}
         {currentScreen === 'engineerTracking' && renderEngineerTrackingPage()}
+        {currentScreen === 'reagents' && renderReagentsPage()}
+        {currentScreen === 'shop' && renderShopPage()}
+        {currentScreen === 'warranty' && renderWarrantyPage()}
+        {currentScreen === 'tracking' && renderTrackingPage()}
+        {currentScreen === 'feedback' && renderFeedbackPage()}
+        {currentScreen === 'training' && renderTrainingPage()}
+        {currentScreen === 'reports' && renderReportsPage()}
       </ScrollView>
     </SafeAreaView>
   );
@@ -837,7 +1093,6 @@ const windowWidth = Dimensions.get('window').width;
 const isMobile = windowWidth < 600;
 
 const styles = StyleSheet.create({
-  /* LOGIN STYLES */
   loginSafeArea: {
     flex: 1,
     backgroundColor: '#f0f7f8',
@@ -1017,7 +1272,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  /* MAIN APP LAYOUT */
   safeArea: {
     flex: 1,
     backgroundColor: '#f8fafc',
@@ -1143,7 +1397,6 @@ const styles = StyleSheet.create({
     borderColor: '#007b8a',
   },
 
-  /* SUBPAGES & COMMON */
   subPageContainer: {
     backgroundColor: '#ffffff',
     borderRadius: 14,
@@ -1313,8 +1566,6 @@ const styles = StyleSheet.create({
     color: '#64748b',
     lineHeight: 16,
   },
-
-  /* PROFILE STYLES */
   profileHeroCard: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1430,8 +1681,6 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     fontWeight: '700',
   },
-
-  /* RECORDS & TRACKING */
   recordCard: {
     backgroundColor: '#f8fafc',
     borderRadius: 10,
