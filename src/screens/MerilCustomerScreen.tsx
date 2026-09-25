@@ -674,25 +674,64 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ----------------------------------------------------
-     6. ENGINEER LIVE TRACKING
+     6. ENGINEER LIVE TRACKING (ZOMATO-STYLE INTERACTIVE MAP)
   ---------------------------------------------------- */
   const renderEngineerTrackingPage = () => {
     const engineer = liveTicket?.assignedEngineer;
+
+    // Hospital Coordinates (Mumbai) & Field Engineer Dispatched Coordinates
+    const labLat = 19.0760;
+    const labLng = 72.8777;
+    const engLat = 19.0880;
+    const engLng = 72.8890;
+
+    // Embed interactive OpenStreetMap centered directly over Mumbai corridor
+    const mapEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${engLng - 0.03}%2C${engLat - 0.02}%2C${labLng + 0.03}%2C${labLat + 0.02}&layer=mapnik&marker=${engLat}%2C${engLng}`;
+
     return (
       <View style={styles.subPageContainer}>
         <Text style={styles.pageHeader}>Live Field Tracking</Text>
         <Text style={styles.pageSubHeader}>
-          Technician communication and dispatched telemetry[cite: 1].
+          Real-time technician telemetry and route navigation.
         </Text>
 
         <View style={styles.recordCard}>
-          <Image
-            source={{
-              uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80',
-            }}
-            style={styles.mapImage}
-          />
-          <View style={styles.engineerCard}>
+          {/* INTERACTIVE MAP CONTAINER */}
+          <View style={styles.liveMapWrapper}>
+            {Platform.OS === 'web' ? (
+              // @ts-ignore
+              <iframe
+                title="Engineer Live Tracking"
+                src={mapEmbedUrl}
+                style={{
+                  width: '100%',
+                  height: 260,
+                  border: 'none',
+                  borderRadius: 12,
+                }}
+              />
+            ) : (
+              <Image
+                source={{
+                  uri: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&auto=format&fit=crop&q=80',
+                }}
+                style={styles.mapImage}
+              />
+            )}
+
+            {/* Floating Telemetry Pill (Zomato-style delivery badge) */}
+            <View style={styles.floatingEtaPill}>
+              <Text style={styles.floatingEtaText}>
+                🛵 {engineer?.name ?? 'Rajesh Sharma'} is {engineer?.distanceKm ?? 3.4} km away
+              </Text>
+              <Text style={styles.floatingEtaSub}>
+                ETA {engineer?.etaMins ?? 25} mins • Fast-Route SLA Active
+              </Text>
+            </View>
+          </View>
+
+          {/* Engineer Profile Card */}
+          <View style={[styles.engineerCard, { marginTop: 12 }]}>
             <Image
               source={{
                 uri: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=150&auto=format&fit=crop&q=80',
@@ -700,16 +739,22 @@ export const MerilCustomerScreen: React.FC = () => {
               style={styles.engineerPhoto}
             />
             <View style={{ flex: 1, marginLeft: 12 }}>
-              <Text style={styles.recordTitle}>{engineer?.name ?? 'Rajesh Sharma'}</Text>
+              <View style={styles.rowBetween}>
+                <Text style={styles.recordTitle}>{engineer?.name ?? 'Rajesh Sharma'}</Text>
+                <View style={[styles.statusTag, styles.statusSuccess]}>
+                  <Text style={styles.statusTagText}>GPS Connected</Text>
+                </View>
+              </View>
               <Text style={styles.recordSubtitle}>
                 {engineer?.role ?? 'Senior Field Specialist'}
               </Text>
               <Text style={styles.etaHighlight}>
-                ⏱ ETA: {engineer?.etaMins ?? 25} Mins ({engineer?.distanceKm ?? 3.4} km away)
+                ⏱ Expected Arrival: in {engineer?.etaMins ?? 25} Mins
               </Text>
             </View>
           </View>
 
+          {/* Contact Buttons */}
           <View style={styles.stackedButtonGroup}>
             <TouchableOpacity
               style={styles.outlinedBtn}
@@ -717,7 +762,7 @@ export const MerilCustomerScreen: React.FC = () => {
                 Alert.alert('Calling', `Dialing ${engineer?.phone ?? '+91 98200 11223'}...`)
               }
             >
-              <Text style={styles.outlinedBtnText}>📞 Voice Call Engineer</Text>
+              <Text style={styles.outlinedBtnText}>📞 Voice Call Specialist</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.primaryBtn, { backgroundColor: '#16a34a' }]}
@@ -1812,10 +1857,45 @@ const styles = StyleSheet.create({
     color: '#155e75',
     textAlign: 'center',
   },
-  mapImage: {
-    height: 140,
+  liveMapWrapper: {
+    position: 'relative',
+    height: 260,
+    width: '100%',
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+    backgroundColor: '#e2e8f0',
+  },
+  floatingEtaPill: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    right: 10,
+    backgroundColor: 'rgba(15, 41, 48, 0.92)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     borderRadius: 8,
-    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  floatingEtaText: {
+    color: '#ffffff',
+    fontSize: 12.5,
+    fontWeight: '800',
+  },
+  floatingEtaSub: {
+    color: '#94a3b8',
+    fontSize: 10.5,
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  mapImage: {
+    height: 260,
+    width: '100%',
+    borderRadius: 12,
   },
   engineerCard: {
     flexDirection: 'row',
