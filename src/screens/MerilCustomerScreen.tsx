@@ -15,6 +15,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
 type ScreenType =
   | 'overview'
@@ -67,7 +68,6 @@ export const MerilCustomerScreen: React.FC = () => {
 
   // Core App State
   const [sosActive, setSosActive] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [unreadCount, setUnreadCount] = useState(4);
   const [feedbackRating, setFeedbackRating] = useState(5);
   const [feedbackText, setFeedbackText] = useState('');
@@ -258,7 +258,7 @@ export const MerilCustomerScreen: React.FC = () => {
 
               <Text style={styles.inputLabel}>LAB / CLIENT ID</Text>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputPrefixIcon}>🏥</Text>
+                <Ionicons name="business-outline" size={18} color="#64748b" style={{ marginRight: 8 }} />
                 <TextInput
                   style={styles.textInput}
                   placeholder="e.g. MER-882190"
@@ -273,9 +273,12 @@ export const MerilCustomerScreen: React.FC = () => {
                 {loginMethod === 'password' ? 'ACCESS PASSWORD' : 'PHONE / VERIFICATION CODE'}
               </Text>
               <View style={styles.inputContainer}>
-                <Text style={styles.inputPrefixIcon}>
-                  {loginMethod === 'password' ? '🔒' : '📱'}
-                </Text>
+                <Ionicons
+                  name={loginMethod === 'password' ? 'lock-closed-outline' : 'phone-portrait-outline'}
+                  size={18}
+                  color="#64748b"
+                  style={{ marginRight: 8 }}
+                />
                 <TextInput
                   style={styles.textInput}
                   placeholder={loginMethod === 'password' ? 'Enter password' : 'Enter 6-digit OTP'}
@@ -356,15 +359,15 @@ export const MerilCustomerScreen: React.FC = () => {
       {notificationsList.map((item) => (
         <View key={item.id} style={[styles.notifCard, item.unread && styles.notifCardUnread]}>
           <View style={styles.notifIconCircle}>
-            <Text style={{ fontSize: 16 }}>
-              {item.type === 'service'
-                ? '🔧'
-                : item.type === 'warranty'
-                ? '🛡️'
-                : item.type === 'order'
-                ? '🧪'
-                : '📄'}
-            </Text>
+            {item.type === 'service' ? (
+              <MaterialCommunityIcons name="wrench-outline" size={18} color="#007b8a" />
+            ) : item.type === 'warranty' ? (
+              <MaterialCommunityIcons name="shield-check-outline" size={18} color="#007b8a" />
+            ) : item.type === 'order' ? (
+              <MaterialCommunityIcons name="flask-outline" size={18} color="#007b8a" />
+            ) : (
+              <Ionicons name="document-text-outline" size={18} color="#007b8a" />
+            )}
           </View>
           <View style={{ flex: 1, marginLeft: 12 }}>
             <View style={styles.rowBetween}>
@@ -793,7 +796,11 @@ export const MerilCustomerScreen: React.FC = () => {
         <View style={{ flexDirection: 'row', gap: 10, marginVertical: 12 }}>
           {[1, 2, 3, 4, 5].map((star) => (
             <TouchableOpacity key={star} onPress={() => setFeedbackRating(star)}>
-              <Text style={{ fontSize: 26 }}>{star <= feedbackRating ? '⭐' : '☆'}</Text>
+              <Ionicons
+                name={star <= feedbackRating ? 'star' : 'star-outline'}
+                size={26}
+                color="#f59e0b"
+              />
             </TouchableOpacity>
           ))}
         </View>
@@ -884,9 +891,16 @@ export const MerilCustomerScreen: React.FC = () => {
           );
         }}
       >
-        <Text style={[styles.ctaButtonText, sosActive && { color: '#be123c' }]}>
-          {sosActive ? '🚨 SOS ACTIVE • CANCEL REQUEST' : '🚨 CTA BUTTON : 4-HR EMERGENCY SOS'}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons
+            name="shield-alert"
+            size={18}
+            color={sosActive ? '#be123c' : '#007b8a'}
+          />
+          <Text style={[styles.ctaButtonText, sosActive && { color: '#be123c' }]}>
+            {sosActive ? 'SOS ACTIVE • CANCEL REQUEST' : 'CTA BUTTON : 4-HR EMERGENCY SOS'}
+          </Text>
+        </View>
       </TouchableOpacity>
 
       {/* 4. HEADER + IMAGE BLOCK */}
@@ -929,7 +943,10 @@ export const MerilCustomerScreen: React.FC = () => {
           activeOpacity={0.85}
           onPress={() => setCurrentScreen('service')}
         >
-          <Text style={styles.actionBtnPrimaryText}>BUTTON: Book Service</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Ionicons name="construct-outline" size={16} color="#ffffff" />
+            <Text style={styles.actionBtnPrimaryText}>BUTTON: Book Service</Text>
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -937,7 +954,10 @@ export const MerilCustomerScreen: React.FC = () => {
           activeOpacity={0.85}
           onPress={() => setCurrentScreen('engineerTracking')}
         >
-          <Text style={styles.actionBtnSecondaryText}>BUTTON: Track Live</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Ionicons name="location-outline" size={16} color="#0f2930" />
+            <Text style={styles.actionBtnSecondaryText}>BUTTON: Track Live</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -972,7 +992,10 @@ export const MerilCustomerScreen: React.FC = () => {
         </Text>
 
         <View style={styles.otpStrip}>
-          <Text style={styles.otpLabel}>Service Closure Verification OTP:</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+            <Ionicons name="key-outline" size={15} color="#475569" />
+            <Text style={styles.otpLabel}>Verification OTP:</Text>
+          </View>
           <Text style={styles.otpValue}>{liveTicket?.verificationOtp ?? '5892'}</Text>
         </View>
 
@@ -981,13 +1004,19 @@ export const MerilCustomerScreen: React.FC = () => {
             style={styles.cardMiniBtn}
             onPress={() => Alert.alert('Call', `Dialing ${engineer?.phone ?? '+91 98200 11223'}`)}
           >
-            <Text style={styles.cardMiniBtnText}>📞 Voice Call</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Ionicons name="call-outline" size={14} color="#ffffff" />
+              <Text style={styles.cardMiniBtnText}>Voice Call</Text>
+            </View>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.cardMiniBtn, { backgroundColor: '#16a34a' }]}
             onPress={() => Alert.alert('WhatsApp', 'Opening encrypted chat...')}
           >
-            <Text style={styles.cardMiniBtnText}>💬 WhatsApp</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name="whatsapp" size={15} color="#ffffff" />
+              <Text style={styles.cardMiniBtnText}>WhatsApp</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -1005,8 +1034,8 @@ export const MerilCustomerScreen: React.FC = () => {
         <Text style={styles.statusBarText}>09:41</Text>
         <Text style={styles.statusBarCenterTitle}>STATUS BAR</Text>
         <View style={styles.statusBarIcons}>
-          <Text style={styles.statusBarIconText}>📶</Text>
-          <Text style={styles.statusBarIconText}>🔋</Text>
+          <Ionicons name="cellular" size={12} color="#0f2930" />
+          <Ionicons name="battery-full" size={14} color="#0f2930" />
         </View>
       </View>
 
@@ -1031,7 +1060,7 @@ export const MerilCustomerScreen: React.FC = () => {
             style={styles.notificationBtn}
             onPress={() => setCurrentScreen('notifications')}
           >
-            <Text style={styles.bellIconEmoji}>🔔</Text>
+            <Ionicons name="notifications-outline" size={18} color="#0f2930" />
             {unreadCount > 0 && (
               <View style={styles.unreadBadge}>
                 <Text style={styles.unreadBadgeText}>{unreadCount}</Text>
@@ -1083,18 +1112,45 @@ export const MerilCustomerScreen: React.FC = () => {
         {currentScreen === 'reports' && renderReportsPage()}
       </ScrollView>
 
-      {/* 8. TAB BAR (5 ICONS) */}
+      {/* 8. TAB BAR (5 ICONS FROM @expo/vector-icons) */}
       <View style={styles.tabBar}>
         <Text style={styles.tabBarHeader}>TAB BAR</Text>
         <View style={styles.tabIconsRow}>
           {[
-            { id: 'overview' as ScreenType, label: 'ICON', icon: '🏠', title: 'Home' },
-            { id: 'machines' as ScreenType, label: 'ICON', icon: '🔬', title: 'Analyzers' },
-            { id: 'service' as ScreenType, label: 'ICON', icon: '🔧', title: 'Service' },
-            { id: 'engineerTracking' as ScreenType, label: 'ICON', icon: '📍', title: 'Tracking' },
-            { id: 'profile' as ScreenType, label: 'ICON', icon: '👤', title: 'Profile' },
+            {
+              id: 'overview' as ScreenType,
+              label: 'ICON',
+              renderIcon: (color: string) => <Ionicons name="home-outline" size={20} color={color} />,
+            },
+            {
+              id: 'machines' as ScreenType,
+              label: 'ICON',
+              renderIcon: (color: string) => (
+                <MaterialCommunityIcons name="microscope" size={20} color={color} />
+              ),
+            },
+            {
+              id: 'service' as ScreenType,
+              label: 'ICON',
+              renderIcon: (color: string) => (
+                <MaterialCommunityIcons name="hammer-wrench" size={20} color={color} />
+              ),
+            },
+            {
+              id: 'engineerTracking' as ScreenType,
+              label: 'ICON',
+              renderIcon: (color: string) => (
+                <MaterialCommunityIcons name="crosshairs-gps" size={20} color={color} />
+              ),
+            },
+            {
+              id: 'profile' as ScreenType,
+              label: 'ICON',
+              renderIcon: (color: string) => <Ionicons name="person-outline" size={20} color={color} />,
+            },
           ].map((tab) => {
             const isSelected = currentScreen === tab.id;
+            const iconColor = isSelected ? '#007b8a' : '#64748b';
             return (
               <TouchableOpacity
                 key={tab.id}
@@ -1103,7 +1159,7 @@ export const MerilCustomerScreen: React.FC = () => {
                 onPress={() => setCurrentScreen(tab.id)}
               >
                 <View style={[styles.tabSquare, isSelected && styles.tabSquareActive]}>
-                  <Text style={styles.tabSquareEmoji}>{tab.icon}</Text>
+                  {tab.renderIcon(iconColor)}
                 </View>
                 <Text style={[styles.tabLabel, isSelected && styles.tabLabelActive]}>
                   {tab.label}
@@ -1120,7 +1176,7 @@ export const MerilCustomerScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f1f5f9', // Clinical light theme background
+    backgroundColor: '#f1f5f9',
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -1155,11 +1211,8 @@ const styles = StyleSheet.create({
   },
   statusBarIcons: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
-  },
-  statusBarIconText: {
-    color: '#0f2930',
-    fontSize: 11,
   },
 
   /* 2. Top Bar */
@@ -1216,9 +1269,6 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  bellIconEmoji: {
-    fontSize: 15,
   },
   unreadBadge: {
     position: 'absolute',
@@ -1497,6 +1547,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   cardMiniBtnText: {
     color: '#ffffff',
@@ -1543,9 +1594,6 @@ const styles = StyleSheet.create({
   tabSquareActive: {
     borderColor: '#007b8a',
     backgroundColor: '#e6f4f6',
-  },
-  tabSquareEmoji: {
-    fontSize: 16,
   },
   tabLabel: {
     color: '#64748b',
@@ -1744,7 +1792,6 @@ const styles = StyleSheet.create({
   },
   otpNote: {
     fontSize: 10,
-    color: '#155e75',
   },
   liveMapWrapper: {
     position: 'relative',
@@ -2044,10 +2091,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 12,
     marginBottom: 16,
-  },
-  inputPrefixIcon: {
-    fontSize: 16,
-    marginRight: 8,
   },
   textInput: {
     flex: 1,
