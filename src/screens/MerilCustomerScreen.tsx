@@ -903,7 +903,7 @@ export const MerilCustomerScreen: React.FC = () => {
         </View>
       </TouchableOpacity>
 
-      {/* 4. HEADER + IMAGE BLOCK */}
+    {/* 4. HEADER + IMAGE BLOCK */}
       <TouchableOpacity
         style={styles.headerImageBlock}
         activeOpacity={0.9}
@@ -912,26 +912,26 @@ export const MerilCustomerScreen: React.FC = () => {
         <View style={styles.headerContainer}>
           <View style={styles.rowBetween}>
             <Text style={styles.headerTitle}>
-              {liveTicket ? liveTicket.analyzer : 'Meril Quant-Mate 400'}
+              Meril Life Sciences • Advancing Healthcare
             </Text>
             <View style={styles.livePill}>
-              <Text style={styles.livePillText}>{liveTicket?.status ?? 'OPERATIONAL'}</Text>
+              <Text style={styles.livePillText}>INNOVATION</Text>
             </View>
           </View>
           <Text style={styles.headerSubtitle}>
-            Clinical Chemistry Analyzer • S/N: MQM-2024-8841 (Tap to view analyzers)
+            Dedicated to advancing healthcare solutions that improve patient outcomes.
           </Text>
         </View>
 
         <View style={styles.imageWrapper}>
           <Image
             source={{
-              uri: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop&q=80',
+              uri: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1200&auto=format&fit=crop&q=80',
             }}
             style={styles.imageMain}
           />
           <View style={styles.imageOverlayTag}>
-            <Text style={styles.imageOverlayText}>LAB INSTRUMENT IMAGE</Text>
+            <Text style={styles.imageOverlayText}>MERIL MEDTECH INNOVATION</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -1119,33 +1119,33 @@ export const MerilCustomerScreen: React.FC = () => {
           {[
             {
               id: 'overview' as ScreenType,
-              label: 'ICON',
+              label: 'Home',
               renderIcon: (color: string) => <Ionicons name="home-outline" size={20} color={color} />,
             },
             {
               id: 'machines' as ScreenType,
-              label: 'ICON',
+              label: 'Analyzers',
               renderIcon: (color: string) => (
                 <MaterialCommunityIcons name="microscope" size={20} color={color} />
               ),
             },
             {
               id: 'service' as ScreenType,
-              label: 'ICON',
+              label: 'Service',
               renderIcon: (color: string) => (
                 <MaterialCommunityIcons name="hammer-wrench" size={20} color={color} />
               ),
             },
             {
               id: 'engineerTracking' as ScreenType,
-              label: 'ICON',
+              label: 'Tracking',
               renderIcon: (color: string) => (
                 <MaterialCommunityIcons name="crosshairs-gps" size={20} color={color} />
               ),
             },
             {
               id: 'profile' as ScreenType,
-              label: 'ICON',
+              label: 'Profile',
               renderIcon: (color: string) => <Ionicons name="person-outline" size={20} color={color} />,
             },
           ].map((tab) => {
