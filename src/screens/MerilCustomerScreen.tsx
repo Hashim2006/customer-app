@@ -1030,14 +1030,7 @@ export const MerilCustomerScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       {/* 1. STATUS BAR */}
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      <View style={styles.statusBarMock}>
-        <Text style={styles.statusBarText}>09:41</Text>
-        <Text style={styles.statusBarCenterTitle}>STATUS BAR</Text>
-        <View style={styles.statusBarIcons}>
-          <Ionicons name="cellular" size={12} color="#0f2930" />
-          <Ionicons name="battery-full" size={14} color="#0f2930" />
-        </View>
-      </View>
+      
 
       {/* 2. TOP BAR */}
       <View style={styles.topBar}>
