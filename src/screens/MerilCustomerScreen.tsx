@@ -84,7 +84,6 @@ export const MerilCustomerScreen: React.FC = () => {
       : 'https://customer-app-eight-mu.vercel.app';
   };
 
-  // Fetch Live Service Ticket from API
   const fetchServiceData = async () => {
     setLoadingService(true);
     try {
@@ -100,7 +99,6 @@ export const MerilCustomerScreen: React.FC = () => {
     }
   };
 
-  // Fetch Live Reagents from API
   const fetchReagentsData = async () => {
     setLoadingReagents(true);
     try {
@@ -207,12 +205,12 @@ export const MerilCustomerScreen: React.FC = () => {
   const engineer = liveTicket?.assignedEngineer;
 
   /* ====================================================
-     SUB-PAGE: LOGIN
+     1. LOGIN SCREEN
   ==================================================== */
   if (currentScreen === 'login') {
     return (
       <SafeAreaView style={styles.loginSafeArea}>
-        <StatusBar barStyle="light-content" backgroundColor="#071520" />
+        <StatusBar barStyle="dark-content" backgroundColor="#f0f7f8" />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.loginContainer}
@@ -326,6 +324,10 @@ export const MerilCustomerScreen: React.FC = () => {
                 </TouchableOpacity>
               </View>
             </View>
+
+            <View style={styles.supportBadge}>
+              <Text style={styles.supportBadgeText}>🔒 ISO 13485 & HIPAA Compliant Healthcare Portal</Text>
+            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -333,7 +335,7 @@ export const MerilCustomerScreen: React.FC = () => {
   }
 
   /* ====================================================
-     SUB-PAGE: NOTIFICATIONS
+     2. NOTIFICATIONS SUB-PAGE
   ==================================================== */
   const renderNotificationsPage = () => (
     <View style={styles.subPageContainer}>
@@ -377,7 +379,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     SUB-PAGE: PROFILE
+     3. PROFILE SUB-PAGE
   ==================================================== */
   const renderProfilePage = () => (
     <View style={styles.subPageContainer}>
@@ -438,7 +440,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     SUB-PAGE: MACHINES
+     4. MY MACHINES SUB-PAGE
   ==================================================== */
   const renderMachinesPage = () => (
     <View style={styles.subPageContainer}>
@@ -505,7 +507,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     SUB-PAGE: SERVICE & SOS
+     5. SERVICE MANAGEMENT & SOS
   ==================================================== */
   const renderServicePage = () => (
     <View style={styles.subPageContainer}>
@@ -542,7 +544,7 @@ export const MerilCustomerScreen: React.FC = () => {
 
       <View style={[styles.rowBetween, { marginTop: 20 }]}>
         <Text style={styles.sectionHeading}>Active Service Request</Text>
-        {loadingService && <ActivityIndicator size="small" color="#38bdf8" />}
+        {loadingService && <ActivityIndicator size="small" color="#007b8a" />}
       </View>
 
       <View style={styles.recordCard}>
@@ -582,7 +584,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     SUB-PAGE: LIVE ENGINEER TRACKING (MAP)
+     6. LIVE ENGINEER TRACKING (MAP)
   ==================================================== */
   const renderEngineerTrackingPage = () => {
     const labLat = 19.076;
@@ -671,7 +673,7 @@ export const MerilCustomerScreen: React.FC = () => {
   };
 
   /* ====================================================
-     SUB-PAGE: REAGENTS
+     7. REAGENTS MODULE
   ==================================================== */
   const renderReagentsPage = () => {
     const defaultReagents: ReagentItem[] = [
@@ -687,14 +689,14 @@ export const MerilCustomerScreen: React.FC = () => {
             <Text style={styles.pageHeader}>Reagent Ordering</Text>
             <Text style={styles.pageSubHeader}>Original Meril assays, calibrators and controls.</Text>
           </View>
-          {loadingReagents && <ActivityIndicator size="small" color="#38bdf8" />}
+          {loadingReagents && <ActivityIndicator size="small" color="#007b8a" />}
         </View>
 
         {items.map((reagent) => (
           <View key={reagent.id} style={styles.recordCard}>
             <View style={styles.rowBetween}>
               <Text style={styles.recordTitle}>{reagent.name}</Text>
-              <Text style={[styles.statNumber, { fontSize: 14, color: '#38bdf8' }]}>
+              <Text style={[styles.statNumber, { fontSize: 14, color: '#007b8a' }]}>
                 ₹{reagent.price.toLocaleString()}
               </Text>
             </View>
@@ -712,7 +714,159 @@ export const MerilCustomerScreen: React.FC = () => {
   };
 
   /* ====================================================
-     MAIN BLUEPRINT OVERVIEW PAGE (Wireframe Match)
+     8. SHOP & CATALOGUE MODULE
+  ==================================================== */
+  const renderShopPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Equipment Catalogue</Text>
+      <Text style={styles.pageSubHeader}>Explore next-generation clinical pathology platforms.</Text>
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>Meril Quant-Mate 800 (High-Throughput)</Text>
+        <Text style={styles.recordSubtitle}>Automated Clinical Chemistry Analyzer • 800 tests/hr</Text>
+        <TouchableOpacity
+          style={[styles.primaryBtn, { marginTop: 10 }]}
+          onPress={() => Alert.alert('Quote Requested', 'A Meril representative will contact you.')}
+        >
+          <Text style={styles.primaryBtnText}>Request Institutional Quotation</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  /* ====================================================
+     9. WARRANTY & AMC MODULE
+  ==================================================== */
+  const renderWarrantyPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Warranty & Annual Maintenance</Text>
+      <Text style={styles.pageSubHeader}>Coverage policies and preventive schedule compliance.</Text>
+      <View style={styles.recordCard}>
+        <View style={styles.rowBetween}>
+          <Text style={styles.recordTitle}>Comprehensive AMC Gold</Text>
+          <View style={[styles.statusTag, styles.statusSuccess]}>
+            <Text style={styles.statusTagText}>Active</Text>
+          </View>
+        </View>
+        <Text style={styles.recordSubtitle}>Coverage: 3 Analyzers (Parts, Labor & Sensors)</Text>
+        <Text style={styles.metaItem}>Valid through: 15 Dec 2027</Text>
+      </View>
+    </View>
+  );
+
+  /* ====================================================
+     10. SERVICE TRACKING TIMELINE
+  ==================================================== */
+  const renderTrackingPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Active Service Ticket Timeline</Text>
+      <Text style={styles.pageSubHeader}>
+        Real-time telemetry for ticket #{liveTicket?.ticketId ?? 'MER-90214'}.
+      </Text>
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>Status: {liveTicket?.status ?? 'In Progress'}</Text>
+        <Text style={styles.metaItem}>1. Dispatched: 10:15 AM</Text>
+        <Text style={styles.metaItem}>
+          2. Field Transit: ETA {liveTicket?.assignedEngineer?.etaMins ?? 25} Mins
+        </Text>
+        <Text style={styles.metaItem}>3. Calibration: Pending Arrival</Text>
+        <TouchableOpacity
+          style={[styles.primaryBtn, { marginTop: 12 }]}
+          onPress={() => setCurrentScreen('engineerTracking')}
+        >
+          <Text style={styles.primaryBtnText}>View GPS Map</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  /* ====================================================
+     11. FEEDBACK MODULE
+  ==================================================== */
+  const renderFeedbackPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Technician Feedback</Text>
+      <Text style={styles.pageSubHeader}>Rate recent service satisfaction for ticket closure.</Text>
+      <View style={styles.recordCard}>
+        <Text style={styles.recordTitle}>
+          Specialist: {liveTicket?.assignedEngineer?.name ?? 'Rajesh Sharma'}
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 10, marginVertical: 12 }}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <TouchableOpacity key={star} onPress={() => setFeedbackRating(star)}>
+              <Text style={{ fontSize: 26 }}>{star <= feedbackRating ? '⭐' : '☆'}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <TextInput
+          style={[
+            styles.textInput,
+            { borderWidth: 1, borderColor: '#e2e8f0', borderRadius: 8, padding: 8 },
+          ]}
+          placeholder="Write your feedback..."
+          value={feedbackText}
+          onChangeText={setFeedbackText}
+        />
+        <TouchableOpacity
+          style={[styles.primaryBtn, { marginTop: 12 }]}
+          onPress={() => {
+            Alert.alert('Feedback Submitted', 'Thank you for rating our service!');
+            setCurrentScreen('overview');
+          }}
+        >
+          <Text style={styles.primaryBtnText}>Submit Rating</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
+  /* ====================================================
+     12. TRAINING & LEARNING
+  ==================================================== */
+  const renderTrainingPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>SOPs & Training Manuals</Text>
+      <Text style={styles.pageSubHeader}>Digital guides and clinical operating procedures.</Text>
+      {['Quant-Mate 400 Calibration Video', 'Daily Optical Sensor Maintenance', 'Reagent Storage Protocol'].map(
+        (doc, index) => (
+          <View key={index} style={styles.recordCard}>
+            <Text style={styles.recordTitle}>{doc}</Text>
+            <TouchableOpacity
+              style={[styles.outlinedBtn, { marginTop: 8 }]}
+              onPress={() => Alert.alert('Resource', `Opening ${doc}`)}
+            >
+              <Text style={styles.outlinedBtnText}>Download PDF / Video 📖</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      )}
+    </View>
+  );
+
+  /* ====================================================
+     13. SERVICE AUDIT REPORTS
+  ==================================================== */
+  const renderReportsPage = () => (
+    <View style={styles.subPageContainer}>
+      <Text style={styles.pageHeader}>Service & Audit Reports</Text>
+      <Text style={styles.pageSubHeader}>Download signed ISO and NABL compliance certificates.</Text>
+      {['Q3 Preventive Calibration Certificate', 'Annual Electrical Safety Audit 2026', 'Optical QC Alignment Report'].map(
+        (rep, idx) => (
+          <View key={idx} style={styles.recordCard}>
+            <Text style={styles.recordTitle}>{rep}</Text>
+            <TouchableOpacity
+              style={[styles.primaryBtn, { marginTop: 8 }]}
+              onPress={() => Alert.alert('Report', `Downloading ${rep}...`)}
+            >
+              <Text style={styles.primaryBtnText}>Download Signed PDF 📄</Text>
+            </TouchableOpacity>
+          </View>
+        )
+      )}
+    </View>
+  );
+
+  /* ====================================================
+     PRIMARY BLUEPRINT OVERVIEW (Matches Wireframe Layout)
   ==================================================== */
   const renderOverviewPage = () => (
     <>
@@ -730,7 +884,7 @@ export const MerilCustomerScreen: React.FC = () => {
           );
         }}
       >
-        <Text style={styles.ctaButtonText}>
+        <Text style={[styles.ctaButtonText, sosActive && { color: '#be123c' }]}>
           {sosActive ? '🚨 SOS ACTIVE • CANCEL REQUEST' : '🚨 CTA BUTTON : 4-HR EMERGENCY SOS'}
         </Text>
       </TouchableOpacity>
@@ -751,7 +905,7 @@ export const MerilCustomerScreen: React.FC = () => {
             </View>
           </View>
           <Text style={styles.headerSubtitle}>
-            Clinical Chemistry Analyzer • S/N: MQM-2024-8841 (Click for details)
+            Clinical Chemistry Analyzer • S/N: MQM-2024-8841 (Tap to view analyzers)
           </Text>
         </View>
 
@@ -772,7 +926,7 @@ export const MerilCustomerScreen: React.FC = () => {
       <View style={styles.dualButtonRow}>
         <TouchableOpacity
           style={[styles.actionBtn, styles.actionBtnPrimary]}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           onPress={() => setCurrentScreen('service')}
         >
           <Text style={styles.actionBtnPrimaryText}>BUTTON: Book Service</Text>
@@ -780,7 +934,7 @@ export const MerilCustomerScreen: React.FC = () => {
 
         <TouchableOpacity
           style={[styles.actionBtn, styles.actionBtnSecondary]}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
           onPress={() => setCurrentScreen('engineerTracking')}
         >
           <Text style={styles.actionBtnSecondaryText}>BUTTON: Track Live</Text>
@@ -841,12 +995,12 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     MAIN WRAPPER & TAB NAVIGATION
+     MAIN APP SHELL (Top Bar, Body, & Tab Bar)
   ==================================================== */
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       {/* 1. STATUS BAR */}
-      <StatusBar barStyle="light-content" backgroundColor="#071520" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <View style={styles.statusBarMock}>
         <Text style={styles.statusBarText}>09:41</Text>
         <Text style={styles.statusBarCenterTitle}>STATUS BAR</Text>
@@ -867,21 +1021,35 @@ export const MerilCustomerScreen: React.FC = () => {
             <Text style={styles.brandBadgeText}>M</Text>
           </View>
           <View>
-            <Text style={styles.topBarTitle}>TOP BAR: MERIL ONE</Text>
-            <Text style={styles.topBarSub}>Apollo Diagnostic Lab (MER-882190)</Text>
+            <Text style={styles.topBarTitle}>MERIL ONE</Text>
+            <Text style={styles.topBarSub}>Apollo Lab • MER-882190</Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.topBarMenuBtn}
-          onPress={() => setCurrentScreen('notifications')}
-        >
-          <Text style={styles.bellIconEmoji}>🔔</Text>
-          {unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadBadgeText}>{unreadCount}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+
+        <View style={styles.headerRightGroup}>
+          <TouchableOpacity
+            style={styles.notificationBtn}
+            onPress={() => setCurrentScreen('notifications')}
+          >
+            <Text style={styles.bellIconEmoji}>🔔</Text>
+            {unreadCount > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadBadgeText}>{unreadCount}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.profileBadgeBtn}
+            onPress={() => setCurrentScreen('profile')}
+          >
+            <Image
+              source={{
+                uri: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=100&auto=format&fit=crop&q=80',
+              }}
+              style={styles.topAvatar}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* SCROLLABLE VIEW CONTAINER */}
@@ -899,7 +1067,7 @@ export const MerilCustomerScreen: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {/* View Router */}
+        {/* View Routing */}
         {currentScreen === 'overview' && renderOverviewPage()}
         {currentScreen === 'notifications' && renderNotificationsPage()}
         {currentScreen === 'profile' && renderProfilePage()}
@@ -907,9 +1075,15 @@ export const MerilCustomerScreen: React.FC = () => {
         {currentScreen === 'service' && renderServicePage()}
         {currentScreen === 'engineerTracking' && renderEngineerTrackingPage()}
         {currentScreen === 'reagents' && renderReagentsPage()}
+        {currentScreen === 'shop' && renderShopPage()}
+        {currentScreen === 'warranty' && renderWarrantyPage()}
+        {currentScreen === 'tracking' && renderTrackingPage()}
+        {currentScreen === 'feedback' && renderFeedbackPage()}
+        {currentScreen === 'training' && renderTrainingPage()}
+        {currentScreen === 'reports' && renderReportsPage()}
       </ScrollView>
 
-      {/* 8. TAB BAR (5 ICONS AS SHOWN IN WIREFRAME) */}
+      {/* 8. TAB BAR (5 ICONS) */}
       <View style={styles.tabBar}>
         <Text style={styles.tabBarHeader}>TAB BAR</Text>
         <View style={styles.tabIconsRow}>
@@ -943,12 +1117,10 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 };
 
-const windowWidth = Dimensions.get('window').width;
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#071520',
+    backgroundColor: '#f1f5f9', // Clinical light theme background
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -967,16 +1139,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderColor: '#0284c7',
-    backgroundColor: '#05111a',
+    borderColor: '#e2e8f0',
+    backgroundColor: '#ffffff',
   },
   statusBarText: {
-    color: '#38bdf8',
+    color: '#0f2930',
     fontSize: 11,
     fontWeight: '700',
   },
   statusBarCenterTitle: {
-    color: '#38bdf8',
+    color: '#64748b',
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1,
@@ -986,20 +1158,20 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   statusBarIconText: {
-    color: '#38bdf8',
+    color: '#0f2930',
     fontSize: 11,
   },
 
   /* 2. Top Bar */
   topBar: {
-    height: 52,
+    height: 56,
     paddingHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderBottomWidth: 1.5,
-    borderColor: '#0284c7',
-    backgroundColor: '#0b1f2e',
+    borderBottomWidth: 1,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#ffffff',
   },
   topBarBrand: {
     flexDirection: 'row',
@@ -1007,36 +1179,46 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   brandBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    borderWidth: 1.5,
-    borderColor: '#38bdf8',
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#007b8a',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0284c725',
   },
   brandBadgeText: {
-    color: '#38bdf8',
+    color: '#ffffff',
     fontWeight: '900',
-    fontSize: 14,
+    fontSize: 15,
   },
   topBarTitle: {
-    color: '#38bdf8',
-    fontSize: 13.5,
+    color: '#0f2930',
+    fontSize: 14.5,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   topBarSub: {
-    color: '#94a3b8',
-    fontSize: 9.5,
+    color: '#64748b',
+    fontSize: 10,
   },
-  topBarMenuBtn: {
-    padding: 6,
+  headerRightGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  notificationBtn: {
     position: 'relative',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#f8fafc',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bellIconEmoji: {
-    fontSize: 18,
+    fontSize: 15,
   },
   unreadBadge: {
     position: 'absolute',
@@ -1055,20 +1237,32 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '800',
   },
+  profileBadgeBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: '#007b8a',
+  },
+  topAvatar: {
+    width: '100%',
+    height: '100%',
+  },
 
   /* Back Button */
   backButton: {
     alignSelf: 'flex-start',
-    backgroundColor: '#0b1f2e',
+    backgroundColor: '#ffffff',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#0284c7',
+    borderColor: '#e2e8f0',
   },
   backButtonText: {
-    color: '#38bdf8',
+    color: '#007b8a',
     fontWeight: '700',
     fontSize: 12,
   },
@@ -1076,19 +1270,19 @@ const styles = StyleSheet.create({
   /* 3. CTA Button */
   ctaButton: {
     borderWidth: 1.5,
-    borderColor: '#38bdf8',
-    backgroundColor: '#0284c715',
-    borderRadius: 8,
+    borderColor: '#007b8a',
+    backgroundColor: '#e6f4f6',
+    borderRadius: 10,
     paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 14,
   },
   ctaButtonActive: {
-    borderColor: '#f43f5e',
-    backgroundColor: '#f43f5e20',
+    borderColor: '#e11d48',
+    backgroundColor: '#ffe4e6',
   },
   ctaButtonText: {
-    color: '#38bdf8',
+    color: '#007b8a',
     fontSize: 12.5,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -1096,47 +1290,51 @@ const styles = StyleSheet.create({
 
   /* 4. Header + Image Block */
   headerImageBlock: {
-    borderWidth: 1.5,
-    borderColor: '#0284c7',
-    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 14,
-    backgroundColor: '#0b1f2e',
+    backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   headerContainer: {
     padding: 12,
-    borderBottomWidth: 1.5,
-    borderColor: '#0284c7',
+    borderBottomWidth: 1,
+    borderColor: '#f1f5f9',
   },
   headerTitle: {
-    color: '#ffffff',
+    color: '#0f2930',
     fontSize: 15,
     fontWeight: '800',
-    letterSpacing: 0.5,
   },
   headerSubtitle: {
-    color: '#94a3b8',
-    fontSize: 10.5,
+    color: '#64748b',
+    fontSize: 11,
     marginTop: 2,
   },
   livePill: {
     borderWidth: 1,
-    borderColor: '#38bdf8',
-    paddingHorizontal: 6,
+    borderColor: '#007b8a',
+    paddingHorizontal: 7,
     paddingVertical: 2,
-    borderRadius: 4,
-    backgroundColor: '#38bdf815',
+    borderRadius: 6,
+    backgroundColor: '#e6f4f6',
   },
   livePillText: {
-    color: '#38bdf8',
-    fontSize: 9,
+    color: '#007b8a',
+    fontSize: 9.5,
     fontWeight: '800',
   },
   imageWrapper: {
     height: 180,
     width: '100%',
     position: 'relative',
-    backgroundColor: '#040d14',
+    backgroundColor: '#f8fafc',
   },
   imageMain: {
     width: '100%',
@@ -1148,14 +1346,14 @@ const styles = StyleSheet.create({
     bottom: 8,
     right: 8,
     borderWidth: 1,
-    borderColor: '#38bdf8',
-    backgroundColor: 'rgba(7, 21, 32, 0.85)',
+    borderColor: '#e2e8f0',
+    backgroundColor: 'rgba(255, 255, 255, 0.92)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 4,
   },
   imageOverlayText: {
-    color: '#38bdf8',
+    color: '#0f2930',
     fontSize: 9,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -1169,27 +1367,29 @@ const styles = StyleSheet.create({
   },
   actionBtn: {
     flex: 1,
-    borderWidth: 1.5,
-    borderColor: '#38bdf8',
-    paddingVertical: 10,
-    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    paddingVertical: 11,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#ffffff',
   },
   actionBtnPrimary: {
-    backgroundColor: '#0284c725',
+    backgroundColor: '#007b8a',
+    borderColor: '#007b8a',
   },
   actionBtnSecondary: {
-    backgroundColor: '#071520',
+    backgroundColor: '#ffffff',
   },
   actionBtnPrimaryText: {
-    color: '#38bdf8',
-    fontSize: 11.5,
+    color: '#ffffff',
+    fontSize: 12,
     fontWeight: '700',
   },
   actionBtnSecondaryText: {
-    color: '#38bdf8',
-    fontSize: 11.5,
+    color: '#0f2930',
+    fontSize: 12,
     fontWeight: '700',
   },
 
@@ -1200,85 +1400,89 @@ const styles = StyleSheet.create({
   },
   textLineLong: {
     height: 3,
-    backgroundColor: '#0284c7',
+    backgroundColor: '#cbd5e1',
     borderRadius: 2,
     width: '100%',
     marginBottom: 6,
-    opacity: 0.8,
   },
   textLineMedium: {
     height: 3,
-    backgroundColor: '#0284c7',
+    backgroundColor: '#e2e8f0',
     borderRadius: 2,
     width: '65%',
     marginBottom: 8,
-    opacity: 0.6,
   },
   statusDescription: {
-    color: '#94a3b8',
-    fontSize: 11,
+    color: '#64748b',
+    fontSize: 11.5,
     lineHeight: 16,
     marginTop: 2,
   },
 
   /* 7. Card */
   cardContainer: {
-    borderWidth: 1.5,
-    borderColor: '#0284c7',
-    borderRadius: 10,
-    padding: 12,
-    backgroundColor: '#0b1f2e',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 12,
+    padding: 14,
+    backgroundColor: '#ffffff',
     marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   cardHeaderSmall: {
-    color: '#94a3b8',
-    fontSize: 9,
+    color: '#64748b',
+    fontSize: 9.5,
     fontWeight: '700',
     letterSpacing: 0.5,
   },
   cardTitle: {
-    color: '#ffffff',
-    fontSize: 14,
+    color: '#0f2930',
+    fontSize: 14.5,
     fontWeight: '800',
     marginTop: 2,
   },
   cardBadge: {
     borderWidth: 1,
-    borderColor: '#38bdf8',
+    borderColor: '#e2e8f0',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 4,
-    backgroundColor: '#0284c720',
+    borderRadius: 6,
+    backgroundColor: '#f8fafc',
   },
   cardBadgeText: {
-    color: '#38bdf8',
+    color: '#007b8a',
     fontSize: 10,
     fontWeight: '800',
   },
   cardSubtitle: {
-    color: '#94a3b8',
-    fontSize: 11,
+    color: '#64748b',
+    fontSize: 11.5,
     marginTop: 4,
   },
   otpStrip: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#071520',
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 6,
+    backgroundColor: '#f8fafc',
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#0284c750',
+    borderColor: '#e2e8f0',
     marginVertical: 10,
   },
   otpLabel: {
-    color: '#94a3b8',
-    fontSize: 10.5,
+    color: '#475569',
+    fontSize: 11,
+    fontWeight: '500',
   },
   otpValue: {
-    color: '#38bdf8',
-    fontSize: 15,
+    color: '#007b8a',
+    fontSize: 16,
     fontWeight: '900',
     letterSpacing: 3,
   },
@@ -1289,28 +1493,28 @@ const styles = StyleSheet.create({
   },
   cardMiniBtn: {
     flex: 1,
-    backgroundColor: '#0284c7',
-    paddingVertical: 7,
-    borderRadius: 6,
+    backgroundColor: '#007b8a',
+    paddingVertical: 8,
+    borderRadius: 8,
     alignItems: 'center',
   },
   cardMiniBtnText: {
     color: '#ffffff',
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '700',
   },
 
   /* 8. Tab Bar */
   tabBar: {
-    borderTopWidth: 1.5,
-    borderColor: '#0284c7',
-    backgroundColor: '#05111a',
-    paddingTop: 4,
-    paddingBottom: Platform.OS === 'ios' ? 16 : 8,
+    borderTopWidth: 1,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#ffffff',
+    paddingTop: 6,
+    paddingBottom: Platform.OS === 'ios' ? 18 : 8,
     paddingHorizontal: 10,
   },
   tabBarHeader: {
-    color: '#38bdf8',
+    color: '#64748b',
     fontSize: 9,
     fontWeight: '800',
     textAlign: 'center',
@@ -1329,16 +1533,16 @@ const styles = StyleSheet.create({
   tabSquare: {
     width: 38,
     height: 38,
-    borderRadius: 8,
-    borderWidth: 1.5,
-    borderColor: '#0284c7',
-    backgroundColor: '#071520',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#f8fafc',
     alignItems: 'center',
     justifyContent: 'center',
   },
   tabSquareActive: {
-    borderColor: '#38bdf8',
-    backgroundColor: '#0284c730',
+    borderColor: '#007b8a',
+    backgroundColor: '#e6f4f6',
   },
   tabSquareEmoji: {
     fontSize: 16,
@@ -1350,25 +1554,29 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   tabLabelActive: {
-    color: '#38bdf8',
+    color: '#007b8a',
   },
 
-  /* Sub-page Specific Styles */
+  /* Sub-Page Styles */
   subPageContainer: {
-    backgroundColor: '#0b1f2e',
+    backgroundColor: '#ffffff',
     borderRadius: 14,
     padding: 16,
-    borderWidth: 1.5,
-    borderColor: '#0284c7',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 2,
   },
   pageHeader: {
     fontSize: 18,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#0f2930',
   },
   pageSubHeader: {
     fontSize: 11.5,
-    color: '#94a3b8',
+    color: '#64748b',
     marginTop: 3,
     marginBottom: 16,
   },
@@ -1378,30 +1586,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   recordCard: {
-    backgroundColor: '#071520',
+    backgroundColor: '#f8fafc',
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#0284c760',
+    borderColor: '#e2e8f0',
     marginBottom: 12,
   },
   recordTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#0f2930',
   },
   recordSubtitle: {
     fontSize: 11.5,
-    color: '#94a3b8',
+    color: '#64748b',
     marginTop: 2,
   },
   metaItem: {
     fontSize: 11.5,
-    color: '#cbd5e1',
+    color: '#475569',
     marginTop: 2,
   },
   primaryBtn: {
-    backgroundColor: '#0284c7',
+    backgroundColor: '#007b8a',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -1414,15 +1622,15 @@ const styles = StyleSheet.create({
   },
   outlinedBtn: {
     borderWidth: 1,
-    borderColor: '#0284c7',
-    backgroundColor: '#071520',
+    borderColor: '#cbd5e1',
+    backgroundColor: '#ffffff',
     paddingVertical: 9,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
   },
   outlinedBtnText: {
-    color: '#38bdf8',
+    color: '#334155',
     fontSize: 12,
     fontWeight: '600',
   },
@@ -1436,30 +1644,26 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   statusSuccess: {
-    backgroundColor: '#0284c725',
-    borderWidth: 1,
-    borderColor: '#38bdf8',
+    backgroundColor: '#dcfce7',
   },
   statusWarning: {
-    backgroundColor: '#fef3c720',
-    borderWidth: 1,
-    borderColor: '#f59e0b',
+    backgroundColor: '#fef3c7',
   },
   statusTagText: {
     fontSize: 9.5,
     fontWeight: '700',
-    color: '#38bdf8',
+    color: '#15803d',
   },
   statusTagTextActive: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#38bdf8',
-    backgroundColor: '#0284c720',
+    color: '#007b8a',
+    backgroundColor: '#e6f4f6',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#38bdf8',
+    borderColor: '#007b8a',
   },
   machineCardTop: {
     flexDirection: 'row',
@@ -1471,9 +1675,9 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   emergencyBox: {
-    backgroundColor: '#88133720',
+    backgroundColor: '#fff1f2',
     borderWidth: 1,
-    borderColor: '#f43f5e',
+    borderColor: '#fecdd3',
     borderRadius: 10,
     padding: 12,
   },
@@ -1486,20 +1690,20 @@ const styles = StyleSheet.create({
   emergencyTitle: {
     fontSize: 14,
     fontWeight: '800',
-    color: '#f43f5e',
+    color: '#be123c',
   },
   emergencyTime: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#f43f5e',
-    backgroundColor: '#f43f5e20',
+    color: '#be123c',
+    backgroundColor: '#ffe4e6',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
   },
   emergencyDesc: {
     fontSize: 11,
-    color: '#fda4af',
+    color: '#881337',
     marginBottom: 10,
     lineHeight: 15,
   },
@@ -1518,9 +1722,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   otpBanner: {
-    backgroundColor: '#071520',
+    backgroundColor: '#ecfeff',
     borderWidth: 1,
-    borderColor: '#0284c7',
+    borderColor: '#a5f3fc',
     borderRadius: 8,
     padding: 10,
     marginVertical: 10,
@@ -1528,19 +1732,19 @@ const styles = StyleSheet.create({
   },
   otpBannerTitle: {
     fontSize: 10.5,
-    color: '#94a3b8',
+    color: '#0e7490',
     fontWeight: '600',
   },
   otpNumber: {
     fontSize: 20,
     fontWeight: '900',
     letterSpacing: 4,
-    color: '#38bdf8',
+    color: '#0891b2',
     marginVertical: 2,
   },
   otpNote: {
     fontSize: 10,
-    color: '#64748b',
+    color: '#155e75',
   },
   liveMapWrapper: {
     position: 'relative',
@@ -1549,20 +1753,18 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#0284c7',
-    backgroundColor: '#040d14',
+    borderColor: '#e2e8f0',
+    backgroundColor: '#f8fafc',
   },
   floatingEtaPill: {
     position: 'absolute',
     top: 10,
     left: 10,
     right: 10,
-    backgroundColor: 'rgba(7, 21, 32, 0.92)',
+    backgroundColor: 'rgba(15, 41, 48, 0.92)',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#38bdf8',
   },
   floatingEtaText: {
     color: '#ffffff',
@@ -1570,7 +1772,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   floatingEtaSub: {
-    color: '#38bdf8',
+    color: '#94a3b8',
     fontSize: 10,
     marginTop: 2,
     fontWeight: '600',
@@ -1583,11 +1785,11 @@ const styles = StyleSheet.create({
   engineerCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#071520',
+    backgroundColor: '#ffffff',
     padding: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#0284c760',
+    borderColor: '#e2e8f0',
   },
   engineerPhoto: {
     width: 40,
@@ -1597,21 +1799,21 @@ const styles = StyleSheet.create({
   etaHighlight: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#38bdf8',
+    color: '#d97706',
     marginTop: 2,
   },
   sectionHeading: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#0f2930',
     marginBottom: 8,
   },
   profileHeroCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#071520',
+    backgroundColor: '#f8fafc',
     borderWidth: 1,
-    borderColor: '#0284c7',
+    borderColor: '#e2e8f0',
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
@@ -1628,12 +1830,10 @@ const styles = StyleSheet.create({
   profileName: {
     fontSize: 14.5,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#0f2930',
   },
   verifiedTag: {
-    backgroundColor: '#0284c720',
-    borderWidth: 1,
-    borderColor: '#38bdf8',
+    backgroundColor: '#dcfce7',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
@@ -1643,25 +1843,25 @@ const styles = StyleSheet.create({
   verifiedTagText: {
     fontSize: 9,
     fontWeight: '700',
-    color: '#38bdf8',
+    color: '#15803d',
   },
   profileIdText: {
     fontSize: 11,
-    color: '#94a3b8',
+    color: '#007b8a',
     marginTop: 2,
   },
   profileInfoList: {
-    backgroundColor: '#071520',
+    backgroundColor: '#f8fafc',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#0284c760',
+    borderColor: '#e2e8f0',
     paddingHorizontal: 12,
     marginBottom: 16,
   },
   infoRow: {
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#0284c730',
+    borderBottomColor: '#e2e8f0',
   },
   infoKey: {
     fontSize: 10.5,
@@ -1671,49 +1871,49 @@ const styles = StyleSheet.create({
   },
   infoVal: {
     fontSize: 12.5,
-    color: '#ffffff',
+    color: '#0f2930',
     fontWeight: '600',
     marginTop: 2,
   },
   logoutBtn: {
     borderWidth: 1,
-    borderColor: '#f43f5e',
-    backgroundColor: '#88133720',
+    borderColor: '#fecdd3',
+    backgroundColor: '#fff1f2',
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
   },
   logoutBtnText: {
-    color: '#f43f5e',
+    color: '#be123c',
     fontSize: 12,
     fontWeight: '700',
   },
   notifCard: {
     flexDirection: 'row',
-    backgroundColor: '#071520',
+    backgroundColor: '#f8fafc',
     borderRadius: 10,
     padding: 12,
     borderWidth: 1,
-    borderColor: '#0284c740',
+    borderColor: '#e2e8f0',
     marginBottom: 10,
   },
   notifCardUnread: {
-    borderColor: '#38bdf8',
+    backgroundColor: '#ffffff',
     borderLeftWidth: 3.5,
-    borderLeftColor: '#38bdf8',
+    borderLeftColor: '#007b8a',
   },
   notifIconCircle: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#0b1f2e',
+    backgroundColor: '#f1f5f9',
     alignItems: 'center',
     justifyContent: 'center',
   },
   notifTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#0f2930',
   },
   notifTime: {
     fontSize: 10,
@@ -1721,20 +1921,18 @@ const styles = StyleSheet.create({
   },
   notifDesc: {
     fontSize: 11.5,
-    color: '#94a3b8',
+    color: '#475569',
     marginTop: 2,
   },
   markReadBtn: {
     paddingHorizontal: 8,
     paddingVertical: 4,
-    backgroundColor: '#0284c725',
-    borderWidth: 1,
-    borderColor: '#38bdf8',
+    backgroundColor: '#e0f2fe',
     borderRadius: 6,
   },
   markReadText: {
     fontSize: 10.5,
-    color: '#38bdf8',
+    color: '#0284c7',
     fontWeight: '700',
   },
   statNumber: {
@@ -1745,7 +1943,7 @@ const styles = StyleSheet.create({
   /* Login Styles */
   loginSafeArea: {
     flex: 1,
-    backgroundColor: '#071520',
+    backgroundColor: '#f0f7f8',
   },
   loginContainer: {
     flex: 1,
@@ -1754,152 +1952,155 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 36,
     paddingBottom: 40,
-    maxWidth: 460,
+    maxWidth: 480,
     width: '100%',
     alignSelf: 'center',
     justifyContent: 'center',
   },
   loginHeader: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 26,
   },
   loginBrandCircle: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#0284c720',
-    borderWidth: 1.5,
-    borderColor: '#38bdf8',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#007b8a',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
   },
   loginBrandImage: {
-    width: 28,
-    height: 28,
-    tintColor: '#38bdf8',
+    width: 32,
+    height: 32,
+    tintColor: '#ffffff',
   },
   loginTitle: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '900',
-    color: '#38bdf8',
+    color: '#0f2930',
     letterSpacing: 1,
   },
   loginSubtitle: {
-    fontSize: 12,
-    color: '#94a3b8',
+    fontSize: 13,
+    color: '#64748b',
     marginTop: 4,
   },
   loginCard: {
-    backgroundColor: '#0b1f2e',
-    borderRadius: 14,
-    padding: 20,
-    borderWidth: 1.5,
-    borderColor: '#0284c7',
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   cardHeading: {
-    fontSize: 17,
+    fontSize: 18,
     fontWeight: '800',
-    color: '#ffffff',
+    color: '#0f2930',
   },
   cardSub: {
-    fontSize: 12,
-    color: '#94a3b8',
-    marginTop: 2,
-    marginBottom: 16,
+    fontSize: 12.5,
+    color: '#64748b',
+    marginTop: 3,
+    marginBottom: 18,
   },
   tabToggle: {
     flexDirection: 'row',
-    backgroundColor: '#071520',
+    backgroundColor: '#f1f5f9',
     borderRadius: 8,
     padding: 3,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#0284c740',
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 7,
+    paddingVertical: 8,
     alignItems: 'center',
     borderRadius: 6,
   },
   tabButtonActive: {
-    backgroundColor: '#0284c7',
+    backgroundColor: '#ffffff',
   },
   tabText: {
-    fontSize: 12,
-    color: '#94a3b8',
+    fontSize: 12.5,
+    color: '#64748b',
     fontWeight: '600',
   },
   tabTextActive: {
-    color: '#ffffff',
+    color: '#007b8a',
     fontWeight: '700',
   },
   inputLabel: {
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '700',
-    color: '#94a3b8',
+    color: '#475569',
     marginBottom: 6,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#071520',
+    backgroundColor: '#f8fafc',
     borderWidth: 1,
-    borderColor: '#0284c760',
-    borderRadius: 8,
+    borderColor: '#e2e8f0',
+    borderRadius: 10,
     paddingHorizontal: 12,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   inputPrefixIcon: {
-    fontSize: 15,
+    fontSize: 16,
     marginRight: 8,
   },
   textInput: {
     flex: 1,
-    fontSize: 13,
-    color: '#ffffff',
-    paddingVertical: 8,
+    fontSize: 13.5,
+    color: '#0f2930',
+    paddingVertical: Platform.OS === 'ios' ? 12 : 8,
   },
   sendOtpBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    backgroundColor: '#0284c725',
-    borderWidth: 1,
-    borderColor: '#38bdf8',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    backgroundColor: '#e0f2fe',
     borderRadius: 6,
   },
   sendOtpText: {
-    fontSize: 11,
-    color: '#38bdf8',
+    fontSize: 11.5,
+    color: '#0284c7',
     fontWeight: '700',
   },
   loginBtn: {
-    backgroundColor: '#0284c7',
-    borderRadius: 8,
-    paddingVertical: 12,
+    backgroundColor: '#007b8a',
+    borderRadius: 10,
+    paddingVertical: 13,
     alignItems: 'center',
     marginTop: 4,
   },
   loginBtnText: {
     color: '#ffffff',
-    fontSize: 14,
+    fontSize: 14.5,
     fontWeight: '800',
   },
   loginFooterRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 6,
-    marginTop: 16,
+    marginTop: 18,
   },
   loginFooterText: {
-    fontSize: 11.5,
+    fontSize: 12,
     color: '#64748b',
   },
   loginFooterLink: {
-    fontSize: 11.5,
-    color: '#38bdf8',
+    fontSize: 12,
+    color: '#007b8a',
     fontWeight: '700',
+  },
+  supportBadge: {
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  supportBadgeText: {
+    fontSize: 11,
+    color: '#94a3b8',
+    fontWeight: '500',
   },
 });
 
