@@ -586,31 +586,41 @@ export const MerilCustomerScreen: React.FC = () => {
     </View>
   );
 
-  /* ====================================================
-     6. LIVE ENGINEER TRACKING (MAP)
+ /* ====================================================
+     6. LIVE GPS TELEMETRY MAP (GOOGLE MAPS)
   ==================================================== */
   const renderEngineerTrackingPage = () => {
-    const labLat = 19.076;
-    const labLng = 72.8777;
     const engLat = 19.088;
     const engLng = 72.889;
-    const mapEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${engLng - 0.03}%2C${engLat - 0.02}%2C${labLng + 0.03}%2C${labLat + 0.02}&layer=mapnik&marker=${engLat}%2C${engLng}`;
+
+    // Real interactive Google Maps embed pinned to the engineer's live coordinates
+    const googleMapUrl = `https://maps.google.com/maps?q=${engLat},${engLng}&hl=en&z=15&output=embed`;
 
     return (
       <View style={styles.subPageContainer}>
-        <Text style={styles.pageHeader}>Live Field Tracking</Text>
-        <Text style={styles.pageSubHeader}>
-          Real-time technician telemetry and route navigation.
-        </Text>
+        <View style={styles.rowBetween}>
+          <View>
+            <Text style={styles.pageHeader}>Live GPS Field Telemetry</Text>
+            <Text style={styles.pageSubHeader}>
+              Real-time technician transit and corridor routing.
+            </Text>
+          </View>
+          <View style={[styles.statusTag, styles.statusSuccess]}>
+            <Text style={styles.statusTagText}>● GPS LIVE</Text>
+          </View>
+        </View>
 
         <View style={styles.recordCard}>
+          {/* REAL INTERACTIVE GOOGLE MAP */}
           <View style={styles.liveMapWrapper}>
             {Platform.OS === 'web' ? (
               // @ts-ignore
               <iframe
-                title="Engineer Live Tracking"
-                src={mapEmbedUrl}
-                style={{ width: '100%', height: 260, border: 'none', borderRadius: 12 }}
+                title="Google Maps Live Tracking"
+                src={googleMapUrl}
+                style={{ width: '100%', height: 300, border: 'none', borderRadius: 12 }}
+                allowFullScreen
+                loading="lazy"
               />
             ) : (
               <Image
@@ -622,11 +632,16 @@ export const MerilCustomerScreen: React.FC = () => {
             )}
 
             <View style={styles.floatingEtaPill}>
-              <Text style={styles.floatingEtaText}>
-                🛵 {engineer?.name ?? 'Rajesh Sharma'} is {engineer?.distanceKm ?? 3.4} km away
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                <Text style={styles.floatingEtaText}>
+                  🛵 {engineer?.name ?? 'Rajesh Sharma'} ({engineer?.distanceKm ?? 3.4} km away)
+                </Text>
+                <Text style={{ color: '#38bdf8', fontSize: 11, fontWeight: '800' }}>
+                  ETA {engineer?.etaMins ?? 25}m
+                </Text>
+              </View>
               <Text style={styles.floatingEtaSub}>
-                ETA {engineer?.etaMins ?? 25} mins • Fast-Route SLA Active
+                En route via Western Express Corridor • High-Priority SLA Active
               </Text>
             </View>
           </View>
@@ -641,15 +656,10 @@ export const MerilCustomerScreen: React.FC = () => {
             <View style={{ flex: 1, marginLeft: 12 }}>
               <View style={styles.rowBetween}>
                 <Text style={styles.recordTitle}>{engineer?.name ?? 'Rajesh Sharma'}</Text>
-                <View style={[styles.statusTag, styles.statusSuccess]}>
-                  <Text style={styles.statusTagText}>GPS Connected</Text>
-                </View>
+                <Text style={styles.etaHighlight}>⏱ {engineer?.etaMins ?? 25} Mins Away</Text>
               </View>
               <Text style={styles.recordSubtitle}>
-                {engineer?.role ?? 'Senior Field Specialist'}
-              </Text>
-              <Text style={styles.etaHighlight}>
-                ⏱ Expected Arrival: in {engineer?.etaMins ?? 25} Mins
+                Senior Field Specialist • Meril Diagnostic Care Hub
               </Text>
             </View>
           </View>
@@ -657,15 +667,13 @@ export const MerilCustomerScreen: React.FC = () => {
           <View style={styles.stackedButtonGroup}>
             <TouchableOpacity
               style={styles.outlinedBtn}
-              onPress={() =>
-                Alert.alert('Calling', `Dialing ${engineer?.phone ?? '+91 98200 11223'}...`)
-              }
+              onPress={() => Alert.alert('Calling Specialist', `Dialing ${engineer?.phone ?? '+91 98200 11223'}...`)}
             >
               <Text style={styles.outlinedBtnText}>📞 Voice Call Specialist</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.primaryBtn, { backgroundColor: '#16a34a' }]}
-              onPress={() => Alert.alert('WhatsApp', 'Opening encrypted chat with specialist...')}
+              onPress={() => Alert.alert('WhatsApp Specialist', 'Opening encrypted chat thread...')}
             >
               <Text style={styles.primaryBtnText}>💬 WhatsApp Specialist</Text>
             </TouchableOpacity>
