@@ -68,7 +68,6 @@ export const MerilCustomerScreen: React.FC = () => {
 
   // Core App State
   const [sosActive, setSosActive] = useState(false);
-  const [sosActive, setSosActive] = useState(false);
 
   // --- PASTE STARTS HERE ---
   // Real-Time 30-Second Rolling Verification OTP
