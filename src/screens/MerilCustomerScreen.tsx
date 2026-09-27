@@ -68,6 +68,38 @@ export const MerilCustomerScreen: React.FC = () => {
 
   // Core App State
   const [sosActive, setSosActive] = useState(false);
+  const [sosActive, setSosActive] = useState(false);
+
+  // --- PASTE STARTS HERE ---
+  // Real-Time 30-Second Rolling Verification OTP
+  const OTP_EXPIRY_SECONDS = 30;
+  const [currentOtp, setCurrentOtp] = useState('5892');
+  const [otpTimeLeft, setOtpTimeLeft] = useState(OTP_EXPIRY_SECONDS);
+
+  const generateNewOtp = () => {
+    const randomOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    setCurrentOtp(randomOtp);
+    setOtpTimeLeft(OTP_EXPIRY_SECONDS);
+  };
+
+  // Real-time 1-second countdown effect
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setOtpTimeLeft((prev) => {
+        if (prev <= 1) {
+          // Timer hit 0: auto-generate a fresh 4-digit code
+          const autoRolledOtp = Math.floor(1000 + Math.random() * 9000).toString();
+          setCurrentOtp(autoRolledOtp);
+          return OTP_EXPIRY_SECONDS;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+  // --- PASTE ENDS HERE ---
+
   const [unreadCount, setUnreadCount] = useState(4);
   const [feedbackRating, setFeedbackRating] = useState(5);
   const [feedbackText, setFeedbackText] = useState('');
@@ -77,6 +109,7 @@ export const MerilCustomerScreen: React.FC = () => {
   const [liveReagents, setLiveReagents] = useState<ReagentItem[]>([]);
   const [loadingService, setLoadingService] = useState(false);
   const [loadingReagents, setLoadingReagents] = useState(false);
+
 
   const getBaseUrl = () => {
     return Platform.OS === 'web' && typeof window !== 'undefined'
