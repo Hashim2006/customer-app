@@ -12,47 +12,47 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface Message {
+export interface Message {
   id: string;
   sender: 'user' | 'bot';
   text: string;
 }
 
-interface MerilChatBotModalProps {
+export interface MerilChatBotModalProps {
   visible: boolean;
   onClose: () => void;
 }
 
 const KNOWLEDGE_BASE: { keywords: string[]; answer: string }[] = [
   {
-    keywords: ['myval', 'valve', 'aortic', 'thv', 'stenosis'],
+    keywords: ['myval', 'valve', 'aortic', 'thv', 'stenosis', 'tavr'],
     answer:
-      "Myval THV series is India's first indigenously developed transcatheter aortic heart valve system for treating severe aortic stenosis, offering precise sizing and low hemodynamic gradients.",
+      "Myval THV series is India's first indigenously developed transcatheter aortic heart valve system for treating severe aortic stenosis, offering precise intermediate sizing and proven low transvalvular gradients.",
   },
   {
-    keywords: ['meres', 'meres100', 'scaffold', 'brs', 'stent'],
+    keywords: ['meres', 'meres100', 'scaffold', 'brs', 'stent', 'coronary'],
     answer:
-      "MeRes100 is the world's first 100-micron bioresorbable vascular scaffold (BRS), engineered to provide temporary vessel support and dissolve completely in coronary arteries over time.",
+      "MeRes100 is the world's first 100-micron thin-strut bioresorbable vascular scaffold (BRS), engineered to provide temporary vessel support and dissolve completely in coronary arteries over time.",
   },
   {
-    keywords: ['robot', 'robotic', 'misso', 'cuvis', 'ortho', 'joint', 'knee'],
+    keywords: ['misso', 'cuvis', 'robot', 'robotic', 'ortho', 'joint', 'knee', 'hip'],
     answer:
-      'Meril Orthopedics features MISSO and Cuvis robotic-assisted surgical systems for high-precision knee and hip joint replacements with personalized CT pre-planning.',
+      'Meril Orthopedics features MISSO and Cuvis robotic-assisted surgical systems for high-precision knee and hip joint replacements with personalized CT pre-planning and sub-millimeter bone resection.',
   },
   {
-    keywords: ['endo', 'suture', 'mesh', 'stapler', 'hemostat', 'sealant'],
+    keywords: ['suture', 'endo', 'mesh', 'stapler', 'hemostat', 'sealant', 'surgery'],
     answer:
-      'Meril Endo-Surgery provides absorbable/non-absorbable surgical sutures, tissue sealants, absorbable hemostats, surgical meshes for hernia repair, and mechanical staplers.',
+      'Meril Endo-Surgery provides absorbable and non-absorbable surgical sutures (Filacryl, MeriGlean), tissue sealants, absorbable hemostats, hernia repair meshes, and mechanical endocutters/staplers.',
   },
   {
     keywords: ['ivd', 'diagnostics', 'analyzer', 'reagent', 'elisa', 'quant-mate', 'autochem'],
     answer:
-      'Meril In-Vitro Diagnostics (IVD) covers clinical chemistry analyzers (AutoChem, Quant-Mate), hematology platforms, ELISA kits, and rapid diagnostic testing strips.',
+      'Meril In-Vitro Diagnostics (IVD) covers clinical chemistry analyzers (AutoChem series), automated hematology counters, ELISA kits, and rapid testing strips for point-of-care diagnosis.',
   },
   {
-    keywords: ['support', 'service', 'emergency', 'sos', 'engineer'],
+    keywords: ['service', 'sos', 'engineer', 'ticket', 'repair', 'technician', 'otp'],
     answer:
-      'For technical emergencies or analyzer breakdown, activate the 4-Hour Emergency SOS in the Meril One app or connect with your field specialist.',
+      'For service emergencies or breakdown repairs, tap the 4-Hour Emergency SOS in the portal. A field specialist will arrive and request your rolling 4-digit OTP to complete sign-off.',
   },
 ];
 
@@ -61,7 +61,7 @@ export const MerilChatBotModal: React.FC<MerilChatBotModalProps> = ({ visible, o
     {
       id: '1',
       sender: 'bot',
-      text: 'Hello! I am your Meril MedTech AI Assistant. Ask me anything about our vascular interventions, orthopedic robotics, surgical solutions, or diagnostic analyzers.',
+      text: 'Hello! I am your Meril MedTech AI Assistant. Ask me about Myval THV, MeRes100 scaffolds, MISSO robotics, surgical sutures, or IVD analyzers.',
     },
   ]);
   const [inputText, setInputText] = useState('');
@@ -73,7 +73,7 @@ export const MerilChatBotModal: React.FC<MerilChatBotModalProps> = ({ visible, o
         return entry.answer;
       }
     }
-    return 'Meril delivers advanced solutions across Vascular Interventions (Myval, MeRes100), Robotics (MISSO, Cuvis), Endo-Surgery, and IVD Diagnostics. You can ask for specific product details or technical documentation.';
+    return 'Meril manufactures advanced medtech solutions across Vascular Intervention (Myval, MeRes100), Robotics (MISSO, Cuvis), Endo-Surgery, and IVD Diagnostics. You can ask for technical specifications, product indications, or service requests.';
   };
 
   const handleSend = (userQuery?: string) => {
@@ -98,40 +98,46 @@ export const MerilChatBotModal: React.FC<MerilChatBotModalProps> = ({ visible, o
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.modalOverlay}
       >
         <View style={styles.chatContainer}>
+          {/* Header */}
           <View style={styles.chatHeader}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={styles.headerLeftGroup}>
               <View style={styles.botIconCircle}>
                 <Ionicons name="sparkles" size={16} color="#ffffff" />
               </View>
               <View>
                 <Text style={styles.headerTitle}>Meril MedTech AI</Text>
-                <Text style={styles.headerStatus}>● Online Knowledge Base</Text>
+                <Text style={styles.headerStatus}>● Live Product Knowledge Base</Text>
               </View>
             </View>
-            <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn} activeOpacity={0.7}>
               <Ionicons name="close" size={20} color="#64748b" />
             </TouchableOpacity>
           </View>
 
+          {/* Prompt Suggestion Chips */}
           <View style={styles.pillsRow}>
-            {['Myval THV', 'MeRes100 BRS', 'MISSO Robotics', 'IVD Analyzers'].map((pill, i) => (
-              <TouchableOpacity
-                key={i}
-                style={styles.pill}
-                onPress={() => handleSend(`Tell me about ${pill}`)}
-              >
-                <Text style={styles.pillText}>{pill}</Text>
-              </TouchableOpacity>
-            ))}
+            {['Myval THV', 'MeRes100 BRS', 'MISSO Robotics', 'IVD Analyzers', 'Emergency SOS'].map(
+              (pill, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={styles.pill}
+                  onPress={() => handleSend(`Tell me about ${pill}`)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.pillText}>{pill}</Text>
+                </TouchableOpacity>
+              )
+            )}
           </View>
 
-          <ScrollView contentContainerStyle={styles.messagesScroll}>
+          {/* Chat Messages */}
+          <ScrollView contentContainerStyle={styles.messagesScroll} showsVerticalScrollIndicator={false}>
             {messages.map((item) => (
               <View
                 key={item.id}
@@ -152,6 +158,7 @@ export const MerilChatBotModal: React.FC<MerilChatBotModalProps> = ({ visible, o
             ))}
           </ScrollView>
 
+          {/* Chat Input Field */}
           <View style={styles.inputArea}>
             <TextInput
               style={styles.textInput}
@@ -161,7 +168,11 @@ export const MerilChatBotModal: React.FC<MerilChatBotModalProps> = ({ visible, o
               onChangeText={setInputText}
               onSubmitEditing={() => handleSend()}
             />
-            <TouchableOpacity style={styles.sendButton} onPress={() => handleSend()}>
+            <TouchableOpacity
+              style={styles.sendButton}
+              onPress={() => handleSend()}
+              activeOpacity={0.8}
+            >
               <Ionicons name="send" size={16} color="#ffffff" />
             </TouchableOpacity>
           </View>
@@ -184,6 +195,7 @@ const styles = StyleSheet.create({
     height: '82%',
     display: 'flex',
     flexDirection: 'column',
+    overflow: 'hidden',
   },
   chatHeader: {
     flexDirection: 'row',
@@ -193,6 +205,11 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderColor: '#e2e8f0',
+  },
+  headerLeftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   botIconCircle: {
     width: 32,

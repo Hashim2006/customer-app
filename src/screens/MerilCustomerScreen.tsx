@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
+  Modal,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -71,7 +72,6 @@ export const MerilCustomerScreen: React.FC = () => {
   const [sosActive, setSosActive] = useState(false);
   const [chatBotOpen, setChatBotOpen] = useState(false);
 
-  // --- PASTE STARTS HERE ---
   // Real-Time 30-Second Rolling Verification OTP
   const OTP_EXPIRY_SECONDS = 30;
   const [currentOtp, setCurrentOtp] = useState('5892');
@@ -83,12 +83,10 @@ export const MerilCustomerScreen: React.FC = () => {
     setOtpTimeLeft(OTP_EXPIRY_SECONDS);
   };
 
-  // Real-time 1-second countdown effect
   useEffect(() => {
     const timer = setInterval(() => {
       setOtpTimeLeft((prev) => {
         if (prev <= 1) {
-          // Timer hit 0: auto-generate a fresh 4-digit code
           const autoRolledOtp = Math.floor(1000 + Math.random() * 9000).toString();
           setCurrentOtp(autoRolledOtp);
           return OTP_EXPIRY_SECONDS;
@@ -99,7 +97,6 @@ export const MerilCustomerScreen: React.FC = () => {
 
     return () => clearInterval(timer);
   }, []);
-  // --- PASTE ENDS HERE ---
 
   const [unreadCount, setUnreadCount] = useState(4);
   const [feedbackRating, setFeedbackRating] = useState(5);
@@ -110,7 +107,6 @@ export const MerilCustomerScreen: React.FC = () => {
   const [liveReagents, setLiveReagents] = useState<ReagentItem[]>([]);
   const [loadingService, setLoadingService] = useState(false);
   const [loadingReagents, setLoadingReagents] = useState(false);
-
 
   const getBaseUrl = () => {
     return Platform.OS === 'web' && typeof window !== 'undefined'
@@ -239,7 +235,7 @@ export const MerilCustomerScreen: React.FC = () => {
   const engineer = liveTicket?.assignedEngineer;
 
   /* ====================================================
-     1. LOGIN SCREEN
+      1. LOGIN SCREEN
   ==================================================== */
   if (currentScreen === 'login') {
     return (
@@ -372,7 +368,7 @@ export const MerilCustomerScreen: React.FC = () => {
   }
 
   /* ====================================================
-     2. NOTIFICATIONS SUB-PAGE
+      2. NOTIFICATIONS SUB-PAGE
   ==================================================== */
   const renderNotificationsPage = () => (
     <View style={styles.subPageContainer}>
@@ -394,11 +390,11 @@ export const MerilCustomerScreen: React.FC = () => {
         <View key={item.id} style={[styles.notifCard, item.unread && styles.notifCardUnread]}>
           <View style={styles.notifIconCircle}>
             {item.type === 'service' ? (
-              <MaterialCommunityIcons name="wrench-outline" size={18} color="#007b8a" />
+              <Ionicons name="construct-outline" size={18} color="#007b8a" />
             ) : item.type === 'warranty' ? (
-              <MaterialCommunityIcons name="shield-check-outline" size={18} color="#007b8a" />
+              <Ionicons name="shield-checkmark-outline" size={18} color="#007b8a" />
             ) : item.type === 'order' ? (
-              <MaterialCommunityIcons name="flask-outline" size={18} color="#007b8a" />
+              <Ionicons name="flask-outline" size={18} color="#007b8a" />
             ) : (
               <Ionicons name="document-text-outline" size={18} color="#007b8a" />
             )}
@@ -416,7 +412,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     3. PROFILE SUB-PAGE
+      3. PROFILE SUB-PAGE
   ==================================================== */
   const renderProfilePage = () => (
     <View style={styles.subPageContainer}>
@@ -477,7 +473,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     4. MY MACHINES SUB-PAGE
+      4. MY MACHINES SUB-PAGE
   ==================================================== */
   const renderMachinesPage = () => (
     <View style={styles.subPageContainer}>
@@ -544,7 +540,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     5. SERVICE MANAGEMENT & SOS
+      5. SERVICE MANAGEMENT & SOS
   ==================================================== */
   const renderServicePage = () => (
     <View style={styles.subPageContainer}>
@@ -606,8 +602,8 @@ export const MerilCustomerScreen: React.FC = () => {
 
         <View style={styles.otpBanner}>
           <Text style={styles.otpBannerTitle}>Service Closure Verification OTP</Text>
-          <Text style={styles.otpNumber}>{liveTicket?.verificationOtp ?? '5892'}</Text>
-          <Text style={styles.otpNote}>Share only after verification of repair.</Text>
+          <Text style={styles.otpNumber}>{currentOtp}</Text>
+          <Text style={styles.otpNote}>Auto-refreshes in {otpTimeLeft}s. Share after repair.</Text>
         </View>
 
         <TouchableOpacity
@@ -620,14 +616,12 @@ export const MerilCustomerScreen: React.FC = () => {
     </View>
   );
 
- /* ====================================================
-     6. LIVE GPS TELEMETRY MAP (GOOGLE MAPS)
+  /* ====================================================
+      6. LIVE GPS TELEMETRY MAP (GOOGLE MAPS)
   ==================================================== */
   const renderEngineerTrackingPage = () => {
     const engLat = 19.088;
     const engLng = 72.889;
-
-    // Real interactive Google Maps embed pinned to the engineer's live coordinates
     const googleMapUrl = `https://maps.google.com/maps?q=${engLat},${engLng}&hl=en&z=15&output=embed`;
 
     return (
@@ -645,7 +639,6 @@ export const MerilCustomerScreen: React.FC = () => {
         </View>
 
         <View style={styles.recordCard}>
-          {/* REAL INTERACTIVE GOOGLE MAP */}
           <View style={styles.liveMapWrapper}>
             {Platform.OS === 'web' ? (
               // @ts-ignore
@@ -718,7 +711,7 @@ export const MerilCustomerScreen: React.FC = () => {
   };
 
   /* ====================================================
-     7. REAGENTS MODULE
+      7. REAGENTS MODULE
   ==================================================== */
   const renderReagentsPage = () => {
     const defaultReagents: ReagentItem[] = [
@@ -759,7 +752,7 @@ export const MerilCustomerScreen: React.FC = () => {
   };
 
   /* ====================================================
-     8. SHOP & CATALOGUE MODULE
+      8. SHOP & CATALOGUE MODULE
   ==================================================== */
   const renderShopPage = () => (
     <View style={styles.subPageContainer}>
@@ -779,7 +772,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     9. WARRANTY & AMC MODULE
+      9. WARRANTY & AMC MODULE
   ==================================================== */
   const renderWarrantyPage = () => (
     <View style={styles.subPageContainer}>
@@ -799,7 +792,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     10. SERVICE TRACKING TIMELINE
+      10. SERVICE TRACKING TIMELINE
   ==================================================== */
   const renderTrackingPage = () => (
     <View style={styles.subPageContainer}>
@@ -825,7 +818,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     11. FEEDBACK MODULE
+      11. FEEDBACK MODULE
   ==================================================== */
   const renderFeedbackPage = () => (
     <View style={styles.subPageContainer}>
@@ -869,7 +862,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     12. TRAINING & LEARNING
+      12. TRAINING & LEARNING
   ==================================================== */
   const renderTrainingPage = () => (
     <View style={styles.subPageContainer}>
@@ -892,7 +885,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     13. SERVICE AUDIT REPORTS
+      13. SERVICE AUDIT REPORTS
   ==================================================== */
   const renderReportsPage = () => (
     <View style={styles.subPageContainer}>
@@ -915,7 +908,7 @@ export const MerilCustomerScreen: React.FC = () => {
   );
 
   /* ====================================================
-     PRIMARY BLUEPRINT OVERVIEW (Matches Wireframe Layout)
+      PRIMARY BLUEPRINT OVERVIEW (Matches Wireframe Layout)
   ==================================================== */
   const renderOverviewPage = () => (
     <>
@@ -934,8 +927,8 @@ export const MerilCustomerScreen: React.FC = () => {
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <MaterialCommunityIcons
-            name="shield-alert"
+          <Ionicons
+            name="alert-circle-outline"
             size={18}
             color={sosActive ? '#be123c' : '#007b8a'}
           />
@@ -945,7 +938,7 @@ export const MerilCustomerScreen: React.FC = () => {
         </View>
       </TouchableOpacity>
 
-    {/* 4. HEADER + IMAGE BLOCK */}
+      {/* 4. HEADER + IMAGE BLOCK */}
       <TouchableOpacity
         style={styles.headerImageBlock}
         activeOpacity={0.9}
@@ -1038,7 +1031,7 @@ export const MerilCustomerScreen: React.FC = () => {
             <Ionicons name="key-outline" size={15} color="#475569" />
             <Text style={styles.otpLabel}>Verification OTP:</Text>
           </View>
-          <Text style={styles.otpValue}>{liveTicket?.verificationOtp ?? '5892'}</Text>
+          <Text style={styles.otpValue}>{currentOtp}</Text>
         </View>
 
         <View style={styles.cardActionRow}>
@@ -1056,7 +1049,7 @@ export const MerilCustomerScreen: React.FC = () => {
             onPress={() => Alert.alert('WhatsApp', 'Opening encrypted chat...')}
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <MaterialCommunityIcons name="whatsapp" size={15} color="#ffffff" />
+              <Ionicons name="logo-whatsapp" size={15} color="#ffffff" />
               <Text style={styles.cardMiniBtnText}>WhatsApp</Text>
             </View>
           </TouchableOpacity>
@@ -1065,8 +1058,8 @@ export const MerilCustomerScreen: React.FC = () => {
     </>
   );
 
- /* ====================================================
-     MAIN APP SHELL (Top Bar, Body, & Tab Bar)
+  /* ====================================================
+      MAIN APP SHELL (Top Bar, Body, & Tab Bar)
   ==================================================== */
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
@@ -1089,7 +1082,6 @@ export const MerilCustomerScreen: React.FC = () => {
           </View>
         </TouchableOpacity>
 
-        {/* Fixed: Only one headerRightGroup */}
         <View style={styles.headerRightGroup}>
           {/* Top Header "Ask AI" Button */}
           <TouchableOpacity
@@ -1172,21 +1164,21 @@ export const MerilCustomerScreen: React.FC = () => {
               id: 'machines' as ScreenType,
               label: 'Analyzers',
               renderIcon: (color: string) => (
-                <MaterialCommunityIcons name="microscope" size={20} color={color} />
+                <Ionicons name="fitness-outline" size={20} color={color} />
               ),
             },
             {
               id: 'service' as ScreenType,
               label: 'Service',
               renderIcon: (color: string) => (
-                <MaterialCommunityIcons name="hammer-wrench" size={20} color={color} />
+                <Ionicons name="construct-outline" size={20} color={color} />
               ),
             },
             {
               id: 'engineerTracking' as ScreenType,
               label: 'Tracking',
               renderIcon: (color: string) => (
-                <MaterialCommunityIcons name="crosshairs-gps" size={20} color={color} />
+                <Ionicons name="navigate-outline" size={20} color={color} />
               ),
             },
             {
@@ -2203,7 +2195,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   supportBadgeText: {
-   fontSize: 11,
+    fontSize: 11,
     color: '#94a3b8',
     fontWeight: '500',
   },
