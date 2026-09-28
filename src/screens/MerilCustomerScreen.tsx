@@ -1055,3 +1055,4 @@ const styles = StyleSheet.create({
   loginBtn: { backgroundColor: '#007b8a', borderRadius: 10, paddingVertical: 13, alignItems: 'center', marginTop: 4 },
   loginBtnText: { color: '#ffffff', fontSize: 14.5, fontWeight: '800' },
 });
+export default MerilCustomerScreen;
