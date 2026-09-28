@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MerilChatBotModal } from '../components/MerilChatBotModal';
 
 type ScreenType =
   | 'overview'
@@ -68,6 +69,7 @@ export const MerilCustomerScreen: React.FC = () => {
 
   // Core App State
   const [sosActive, setSosActive] = useState(false);
+  const [chatBotOpen, setChatBotOpen] = useState(false);
 
   // --- PASTE STARTS HERE ---
   // Real-Time 30-Second Rolling Verification OTP
@@ -1063,14 +1065,13 @@ export const MerilCustomerScreen: React.FC = () => {
     </>
   );
 
-  /* ====================================================
+ /* ====================================================
      MAIN APP SHELL (Top Bar, Body, & Tab Bar)
   ==================================================== */
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
       {/* 1. STATUS BAR */}
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
-      
 
       {/* 2. TOP BAR */}
       <View style={styles.topBar}>
@@ -1088,7 +1089,18 @@ export const MerilCustomerScreen: React.FC = () => {
           </View>
         </TouchableOpacity>
 
+        {/* Fixed: Only one headerRightGroup */}
         <View style={styles.headerRightGroup}>
+          {/* Top Header "Ask AI" Button */}
+          <TouchableOpacity
+            style={styles.aiHeaderBtn}
+            onPress={() => setChatBotOpen(true)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="sparkles" size={15} color="#007b8a" />
+            <Text style={styles.aiHeaderBtnText}>Ask AI</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.notificationBtn}
             onPress={() => setCurrentScreen('notifications')}
@@ -1100,6 +1112,7 @@ export const MerilCustomerScreen: React.FC = () => {
               </View>
             )}
           </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.profileBadgeBtn}
             onPress={() => setCurrentScreen('profile')}
@@ -1145,7 +1158,7 @@ export const MerilCustomerScreen: React.FC = () => {
         {currentScreen === 'reports' && renderReportsPage()}
       </ScrollView>
 
-      {/* 8. TAB BAR (5 ICONS FROM @expo/vector-icons) */}
+      {/* 8. TAB BAR */}
       <View style={styles.tabBar}>
         <Text style={styles.tabBarHeader}>TAB BAR</Text>
         <View style={styles.tabIconsRow}>
@@ -1202,6 +1215,22 @@ export const MerilCustomerScreen: React.FC = () => {
           })}
         </View>
       </View>
+
+      {/* FLOATING AI ASSISTANT PILL */}
+      <TouchableOpacity
+        style={styles.floatingAiBtn}
+        onPress={() => setChatBotOpen(true)}
+        activeOpacity={0.85}
+      >
+        <Ionicons name="sparkles" size={16} color="#ffffff" />
+        <Text style={styles.floatingAiText}>Ask AI</Text>
+      </TouchableOpacity>
+
+      {/* MERIL AI CHATBOT MODAL */}
+      <MerilChatBotModal
+        visible={chatBotOpen}
+        onClose={() => setChatBotOpen(false)}
+      />
     </SafeAreaView>
   );
 };
@@ -2174,10 +2203,48 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   supportBadgeText: {
-    fontSize: 11,
+   fontSize: 11,
     color: '#94a3b8',
     fontWeight: '500',
   },
-});
 
-export default MerilCustomerScreen;
+  aiHeaderBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#e6f4f6',
+    borderWidth: 1,
+    borderColor: '#007b8a',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  aiHeaderBtnText: {
+    color: '#007b8a',
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  floatingAiBtn: {
+    position: 'absolute',
+    bottom: 90,
+    right: 24,
+    backgroundColor: '#007b8a',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 25,
+    zIndex: 9999,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  floatingAiText: {
+    color: '#ffffff',
+    fontSize: 12.5,
+    fontWeight: '800',
+  },
+});
